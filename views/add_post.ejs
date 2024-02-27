@@ -1,0 +1,53 @@
+<%- include('partials/_header') -%>
+<body>
+<%- include('partials/_navigation') -%>
+  <!-- Page Header -->
+  <header class="masthead">
+    <div class="overlay"></div>
+    <div class="nav-strip"></div>
+  </header>
+
+  <!-- Main Content -->
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-8 col-md-10 mx-auto">
+        <form method="post" action="/posts" class="control-group" encType="multipart/form-data">
+          <!--<div class="control-group">-->
+            <div class="form-group floating-label-form-group controls">
+              <label>Post Title</label>
+              <input type="text" name="title" class="form-control" placeholder="Post Title" required data-validation-required-message="Please enter post title">
+              <p class="help-block text-danger" style="margin: 0;"></p>
+            </div>
+         <!-- </div>-->
+          <div class="control-group">
+            <div class="form-group floating-label-form-group controls">
+              <label>Post Description</label>
+              <textarea rows="5" name="detail" class="form-control" placeholder="Post Description" required data-validation-required-message="Please enter post description"></textarea>
+              <p class="help-block text-danger"></p>
+            </div>
+          </div>
+          <div class="form-group floating-label-form-group controls">
+            <label>Add Photo</label>
+            <input type="file" name="image" class="form-control" required >
+            <p class="help-block text-danger" style="margin: 0;"></p>
+          </div>
+          <div class="form-group floating-label-form-group controls">
+            <label>Short Description</label>
+            <input type="text" name="shortDescription" class="form-control" placeholder="Short Description">
+            <p class="help-block text-danger"></p>
+          </div>
+          <div class="consent-public-check form-check">
+            <input type="checkbox" class="form-check-input" id="publicPost" name="publicPost">
+            <label class="form-check-label" for="publicPost">Public Post</label>
+          </div>   
+          <br>
+          <div id="success"></div>
+          <button type="submit" class="btn btn-primary" id="sendMessageButton">Send</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <hr>
+<%- include('partials/_footer') -%>
+</body>

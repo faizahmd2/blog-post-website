@@ -1,0 +1,36 @@
+<%- include('partials/_header') -%>
+<body>
+<%- include('partials/_navigation') -%>
+  <!-- Page Header -->
+  <header class="masthead">
+    <div class="overlay"></div>
+    <div class="nav-strip"></div>
+  </header>
+
+  <div class="container mt-5 posts">
+    <div class="input-group mb-3 search">
+      <input type="text" class="form-control" placeholder="Search..." aria-label="Search" aria-describedby="button-addon2">
+      <button class="btn btn-outline-secondary" type="button" id="button-addon2">Search</button>
+    </div>
+    <div class="posts-container">
+      <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-1">
+        <% posts.forEach(post => { %>
+          <div class="col">
+              <div class="card mb-4">
+                  <img src="<%= post.image %>" class="card-img-top" alt="...">
+                  <div class="card-body">
+                      <h5 class="card-title"><%= post.title %></h5>
+                      <p class="card-text"><%= post.detail.slice(0, 172) + (post.detail.length > 172 ? "..." : "") %></p>
+                  </div>
+              </div>
+          </div>
+        <% }); %>
+      </div>
+    </div>
+  </div>
+
+  <hr>
+</body>
+<%- include('partials/_footer') -%>
+
+
