@@ -1,0 +1,221 @@
+::-webkit-calendar-picker-indicator {
+    cursor: pointer; /* optional */
+}
+
+.forget-pass {
+    display: flex;
+    justify-content: space-evenly;
+    margin-bottom: 15px;
+}
+
+.forget-pass span{
+    color: #d2ffce;
+    cursor: pointer;
+}
+
+
+.background {
+    position: relative;
+}
+
+.background-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('/img/background.jpg');
+    background-size: cover;
+    background-position: center;
+    z-index: -1; /* Ensure the background image is behind the overlay */
+}
+
+.background::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5); /* Adjust the opacity here (0.5 is 50% opacity) */
+}
+
+.full-screen-container {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    position: relative;
+    z-index: 1;
+}
+
+.large-screen-container {
+    /* height: 150vh; */
+}
+
+.input-container {
+    background-color: hsl(200,100%,6%, .7);
+    box-shadow: 0 0 15px 0 hsl(200,100%,6%, .7);
+    padding: 30px 40px 40px;
+    width: 80%;
+    max-width: 625px;
+    border-radius: 20px;
+    height: fit-content;
+    margin-top: 6rem;
+    max-height: 612px;
+}
+
+.login-title {
+    margin: 0;
+    color: #fff;
+    text-align: center;
+    font-size: 1.5rem;
+    font-weight: normal;
+}
+
+.form, .feild-container {
+    display: flex;
+    flex-direction: column;
+    color: #fff;
+    gap: 15px;
+    margin-top: 1em;
+}
+
+.feild-container {
+    margin-top: 0;
+    max-height: 355px;
+    overflow-y: auto;
+}
+
+.login .form {
+    max-height: 612px;
+    font-size: 0.9em;
+}
+
+.input-group, .footer {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.login .footer {
+    gap: 0;
+    background-color: transparent;
+}
+
+.input-group label {
+    color: #fff;
+    font-weight: lighter;
+}
+
+.input-group input {
+    font-size: 1.25rem;
+    color: #fff;
+    padding: 0.5em;
+    background-color: hsl(200,100%,91%, .3);
+    border: none;
+    outline: none;
+    border-radius: .25rem;
+    color: #fff;
+    font-weight: lighter;
+}
+
+.input-group input.success {
+    box-shadow: 0 0 0 1px hsl(100,60%,50%);
+}
+
+.input-group input.error {
+    box-shadow: 0 0 0 1px #f28888;
+}
+
+.input-group input:focus {
+    box-shadow: 0 0 0 1px hsl(200,100%,50%);
+}
+
+.input-group .msg {
+    font-size: .75rem;
+}
+
+.input-group input.error + .msg {
+    color: #f28888;
+}
+
+.button-container {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+.button-container .submit-button {
+    padding: .4em 2em;
+    font-size: 1.3rem;
+    font-weight: lighter;
+    color: #fff;
+    background-color: hsl(200, 100%, 50%, .25);
+    border: 1px solid hsl(200, 100%, 50%);
+    border-radius: .25em;
+    outline: none;
+    cursor: pointer;
+}
+
+.submit-button:hover,
+.submit-button:focus {
+    background-color: hsl(200, 100%, 50%, .4);
+}
+
+.red {
+    color: #f28888;
+}
+
+.additional-fields {
+    display: flex;
+    flex-direction: column;
+    color: #fff;
+    gap: 15px;
+}
+
+.additional {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.additional img {
+    width: 1.4rem;
+    color: #fff;
+    background: #b9d7d7;
+    border-radius: 15px;
+    cursor: pointer;
+}
+
+.button-container .disabled {
+    background-color: #a5a9ac40;
+    border: #737d82;
+    cursor: not-allowed;
+}
+
+.password-toggle {
+    position: relative;
+}
+
+.password-toggle img {
+    width: 1.5rem;
+    position: absolute;
+    top: 60%;
+    right: 20px;
+    cursor: pointer;
+}
+
+.feild-container::-webkit-scrollbar {
+    width: 0.4em;
+}
+
+.feild-container::-webkit-scrollbar-track {
+    box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+}
+
+.feild-container::-webkit-scrollbar-thumb {
+    background-color: darkgrey;
+    outline: 1px solid slategrey;
+    border-radius: 5px;
+}

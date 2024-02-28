@@ -6,7 +6,8 @@ const pageController = require('./controllers/pageController');
 
 module.exports = function (app) {
   // User Routes
-  app.post('/signin', login.loginUser);
+  app.get('/login', login.renderLogin);
+  app.post('/login', login.loginUser);
   app.post('/signup', login.registerUser);
   app.get('/signout',auth.requiresLogin, login.signout);
   

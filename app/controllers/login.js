@@ -70,6 +70,9 @@ module.exports = {
         console.error(error);
         res.status(500).json({status:0,message:'Something Went Wrong'});
     }
+  },
+  renderLogin: (req, res) => {
+    res.render("login", { ...req.query })
   }
 };
 
