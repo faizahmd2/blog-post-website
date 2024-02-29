@@ -42,7 +42,7 @@
 
 .full-screen-container {
     width: 100vw;
-    height: 100vh;
+    min-height: 100vh;
     display: flex;
     justify-content: center;
     position: relative;
@@ -56,20 +56,21 @@
 .input-container {
     background-color: hsl(200,100%,6%, .7);
     box-shadow: 0 0 15px 0 hsl(200,100%,6%, .7);
-    padding: 30px 40px 40px;
+    padding: 30px 40px 20px;
     width: 80%;
     max-width: 625px;
     border-radius: 20px;
     height: fit-content;
-    margin-top: 6rem;
+    margin-top: 4.5rem;
     max-height: 612px;
+    margin-bottom: 2rem;
 }
 
 .login-title {
     margin: 0;
     color: #fff;
     text-align: center;
-    font-size: 1.5rem;
+    font-size: 1.3rem;
     font-weight: normal;
 }
 
@@ -83,13 +84,14 @@
 
 .feild-container {
     margin-top: 0;
-    max-height: 355px;
+    max-height: 345px;
     overflow-y: auto;
+    padding-bottom: 2px;
 }
 
 .login .form {
     max-height: 612px;
-    font-size: 0.9em;
+    font-size: 0.85em;
 }
 
 .input-group, .footer {
@@ -101,6 +103,7 @@
 .login .footer {
     gap: 0;
     background-color: transparent;
+    padding: 0;
 }
 
 .input-group label {
@@ -109,9 +112,9 @@
 }
 
 .input-group input {
-    font-size: 1.25rem;
+    font-size: 1.2rem;
     color: #fff;
-    padding: 0.5em;
+    padding: 0.3em;
     background-color: hsl(200,100%,91%, .3);
     border: none;
     outline: none;
@@ -147,7 +150,7 @@
 }
 
 .button-container .submit-button {
-    padding: .4em 2em;
+    padding: .3em 1.6em;
     font-size: 1.3rem;
     font-weight: lighter;
     color: #fff;
@@ -183,7 +186,6 @@
 .additional img {
     width: 1.4rem;
     color: #fff;
-    background: #b9d7d7;
     border-radius: 15px;
     cursor: pointer;
 }
@@ -201,21 +203,39 @@
 .password-toggle img {
     width: 1.5rem;
     position: absolute;
-    top: 60%;
+    top: 55%;
     right: 20px;
     cursor: pointer;
 }
 
-.feild-container::-webkit-scrollbar {
-    width: 0.4em;
-}
+@media only screen and (max-width: 768px) {
+    .input-group input {
+        font-size: 1.1rem;
+        padding: 0.28em;
+    }
 
-.feild-container::-webkit-scrollbar-track {
-    box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
-}
+    .login-title {
+        font-size: 1rem;
+    }
 
-.feild-container::-webkit-scrollbar-thumb {
-    background-color: darkgrey;
-    outline: 1px solid slategrey;
-    border-radius: 5px;
+    .login .form {
+        font-size: .8rem;
+    }
+
+    .input-container {
+        padding: 22px 22px 20px;
+        width: 90%;
+    }
+
+    .button-container .submit-button {
+        font-size: 1rem;
+    }
+
+    .feild-container {
+        max-height: 380px;
+    }
+
+    .input-group label {
+        margin-bottom: 0.3rem;
+    }
 }
