@@ -123,16 +123,17 @@
     font-weight: lighter;
 }
 
+.input-group input:focus {
+    box-shadow: 0 0 0 1px hsl(200,100%,50%);
+}
+
 .input-group input.success {
     box-shadow: 0 0 0 1px hsl(100,60%,50%);
 }
 
+
 .input-group input.error {
     box-shadow: 0 0 0 1px #f28888;
-}
-
-.input-group input:focus {
-    box-shadow: 0 0 0 1px hsl(200,100%,50%);
 }
 
 .input-group .msg {
@@ -196,14 +197,15 @@
     cursor: not-allowed;
 }
 
-.password-toggle {
+.password-parent, .password2-parent {
     position: relative;
 }
 
-.password-toggle img {
+.password-parent img,
+.password2-parent img {
     width: 1.5rem;
     position: absolute;
-    top: 55%;
+    top: 60%;
     right: 20px;
     cursor: pointer;
 }

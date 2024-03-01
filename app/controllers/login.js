@@ -72,7 +72,8 @@ module.exports = {
     }
   },
   renderLogin: (req, res) => {
-    res.render("login", { ...req.query })
+    let isSignup = req.query.register == "1";
+    res.render("login", { isSignup });
   }
 };
 

@@ -6,75 +6,78 @@
     <div class="background-image"></div>
     <div class="login full-screen-container large-screen-container">
       <div class="input-container">
-        <h1 class="login-title">SIGN IN</h1>
-        <form class="form" action="/signup" method="post" enctype="multipart/form-data">
+        <h1 class="login-title">SIGN <%= isSignup ? 'UP' : 'IN' %></h1>
+        <div class="form" action="<%= isSignup ? 'signup' : 'login' %>">
           <div class="feild-container">
-            <div class="input-group input-name">
-              <label for="name">Full Name<span class="red">*</span></label>
-              <input type="text" name="name" id="name" class="success error" placeholder="Full Name">
-              <span err-message="name" class="msg">Invalid Name</span>
-            </div>
+            <% if(isSignup){ %>
+              <div class="input-group name-parent">
+                <label for="name">Full Name<span class="red">*</span></label>
+                <input type="text" name="name" class="input-name" placeholder="Full Name">
+              </div>
+           <% } %>
 
-            <div class="input-group">
+            <div class="input-group email-parent">
               <label for="email">Email<span class="red">*</span></label>
-              <input type="email" name="email" id="email" class="success error" placeholder="Email">
-              <span err-message="email" class="msg">Invalid email</span>
+              <input type="email" name="email" class="input-email" placeholder="Email">
+              <!-- <span err-message="email" class="msg red">*Invalid Email</span> -->
             </div>
 
-            <div class="input-group password-toggle">
+            <div class="input-group password-parent">
               <label for="password">Password<span class="red">*</span></label>
-              <input type="password" name="password" id="password" class="input-password error" placeholder="Password">
+              <input type="password" name="password" class="input-password" placeholder="Password">
               <img class="icon-password" src="/img/icons/invisible.png" alt="" onclick="togglePasswordVisibility('password')">
-              <span err-message="password" class="msg">Password must be minimum 6 characters</span>
             </div>
 
-            <div class="input-group password-toggle password2-parent">
+            <% if(isSignup){ %>
+            <div class="input-group password2-parent">
               <label for="password2">Verify Password<span class="red">*</span></label>
-              <input type="password" name="password2" id="password2" class="input-password2 success"
+              <input type="password" name="password2" class="input-password2"
                 placeholder="Verify Password">
               <img class="icon-password2" src="/img/icons/invisible.png" alt="" onclick="togglePasswordVisibility('password2')">
-              <span err-message="password2" class="msg">Password Not Matched</span>
             </div>
 
             <div class="additional-fields">
               <div class="input-group">
                 <label for="phone">Phone</label>
-                <input type="number" name="phone" id="phone" placeholder="Phone">
+                <input type="number" name="phone" placeholder="Phone">
               </div>
 
               <div class="input-group">
                 <label for="dob">Date Of Birth</label>
-                <input type="date" name="age" id="age">
+                <input type="date" name="age">
               </div>
 
               <div class="input-group">
                 <label for="address">Address</label>
-                <input type="text" name="address" id="address" placeholder="Address">
+                <input type="text" name="address" placeholder="Address">
               </div>
 
               <div class="input-group">
                 <label for="pincode">Pincode</label>
-                <input type="number" name="pincode" id="pincode" placeholder="Pincode">
+                <input type="number" name="pincode" placeholder="Pincode">
               </div>
 
               <div class="input-group">
                 <label for="message">Message</label>
-                <textarea name="message" id="message" cols="5" rows="4" placeholder="Message"></textarea>
+                <textarea name="message" cols="5" rows="4" placeholder="Message"></textarea>
               </div>
             </div>
-            <div class="additional">
+            <div class="additional" style="display: none;">
               <img class="additional-icon" src="/img/icons/slide-down.png" alt="" onclick="toggleAdditionalFields()">
               <span>Add Additional Details</span>
             </div>
+            <% } %>
           </div>
           <div class="footer">
             <div class="forget-pass">
+              <% if(!isSignup){ %>
               <span>Forgot Password?</span>
-              <span class="toggle-span" onclick="toggleSigningMethod()">Signup?</span>
+              <% } %>
+              <span class="toggle-span" onclick="toggleSigningMethod()"> <%= isSignup ? 'Signin?' : 'Signup?' %> </span>
             </div>
             <div class="button-container">
               <button id="reset-btn" type="button" class="submit-button" onclick="resetFormData()">Reset</button>
-              <button id="submit-btn" type="submit" class="submit-button disabled">Login</button>
+              <button id="submit-btn" type="submit" class="submit-button disabled" onclick="submitForm(true)"> <%= isSignup ? 'Signup' : 'Login' %> </button>
             </div>
           </div>
         </form>
@@ -84,21 +87,76 @@
 
   <script src="vendor/jquery/jquery.min.js"></script>
   <script src="vendor/bootstrap/js/bootstrap.min.js"></script>
+  <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.21/lodash.min.js"></script> -->
+  <script src="js/login.js"></script>
+  <script src="js/utility.js"></script>
+
   <script>
-    resetFormData();
-    function toggleSigningMethod() {
-      var formElem = $("form");
-      if (isSignup()) {
-        formElem.attr("action", "/login");
+    let validationInput;
+
+    init();
+
+    function init() {
+      if(isSignup()) {
+        validationInput = ["name", "email", "password", "password2"];
       } else {
-        formElem.attr("action", "/signup");
+        validationInput = ["email", "password"];
       }
       resetFormData();
     }
 
+    async function submitForm(btnSubmit) {
+      if(btnSubmit) {
+        let submitError = submitFormError();
+        if(submitError) return;
+      }
+
+      let formData = getFormData();
+      let isLogin = !isSignup();
+
+      let response = await fetchData(isLogin ? '/login' : '/signup', 'POST', formData);
+      console.log("METHOD",isLogin);
+      console.log("response",response);
+    }
+
+    function getFormData(reset) {
+      let dta = {};
+      $('input').each(function() {
+          if(reset) {
+            $(this).val('');
+          } else {
+            dta[this.name] = $(this).val();
+          }
+      });
+      $('textarea').each(function() {
+          if(reset) {
+            $(this).val('');
+          } else {
+            dta[this.name] = $(this).val();
+          }
+      });
+
+      if(!reset) return dta;
+    }
+
+    function toggleSigningMethod() {
+      let params = new URLSearchParams(window.location.search);
+
+      if(isSignup()) {
+        params.delete('register');
+      } else {
+        params.set('register', '1');
+      }
+
+      window.history.replaceState({}, '', `${window.location.pathname}?${params}`);
+      window.location.reload();
+    }
+
     function isSignup() {
-      console.log("form attrr",$("form").attr("action"))
-      return $("form").attr("action") === "/signup";
+      let queryParam = parseSearchQuery();
+      if(queryParam.register == "1") return true;
+
+      return false;
     }
 
     function isAdditional() {
@@ -138,30 +196,124 @@
     }
 
     function resetFormData() {
-      console.log("isSignup===",isSignup());
       if (isSignup()) {
-        $(".login-title").text("SIGN UP");
-        $(".input-name").show();
-        $(".additional").show();
-        // $(".additional-fields").show();
-        $(".password2-parent").show();
-        $(".toggle-span").text("Signin?");
-        $("#submit-btn").text("Signup");
-      } else {
-        $(".login-title").text("SIGN IN");
-        $(".additional").hide();
-        // $(".additional-fields").hide();
-        $(".input-name").hide();
-        $(".password2-parent").hide();
-        $(".toggle-span").text("Signup?");
-        $("#submit-btn").text("Login");
+        $(".additional-fields").hide();
       }
-      $(".additional-fields").hide();
-      // $("span[err-message='name']").hide();
-      $("span[err-message='email']").hide();
-      $("span[err-message='password']").hide();
-      $("span[err-message='password2']").hide();
+      
+      getFormData(true);
+
+      for(let _type of validationInput) {
+        $(`span[err-message='${_type}']`).hide();
+        $(`.input-${_type}`).removeClass("error");
+        $(`.input-${_type}`).removeClass("success");
+        if(_type.includes("password")) setPasswordIcon(_type, '60%');
+      }
     }
 
+    function showError(type, message) {
+      const messageElement = $(`span[err-message='${type}']`);
+      
+      if (messageElement.length) {
+        messageElement.text(`*${message}`);
+        messageElement.show();
+      } else {
+        const elem = $('<span>', { 'err-message': type, 'class': 'msg red', text: `*${message}` });
+        let parentClass = "." + type+"-parent";
+        const parentDiv = $(parentClass);
+        parentDiv.append(elem);
+      }
+
+      if(type.includes("password")) setPasswordIcon(type, '47%');
+    }
+
+    function setPasswordIcon(name,value) {
+      $(`.icon-${name}`).css("top", value);
+    }
+
+    function hideError(type) {
+      const messageElement = $(`span[err-message='${type}']`);
+      if (messageElement.length) {
+        messageElement.hide();
+        let parentClass = "." + type+"-parent";
+        if(type.includes("password")) setPasswordIcon(type, '60%');
+      }
+    }
+
+    function submitFormError() {
+      for(let _type of validationInput) {
+        let error = formValid(_type, $(`.input-${_type}`).val());
+        if(error) {
+          return error;
+        }
+      }
+
+      return false;
+    }
+
+    function formValid(type, value) {
+      let error = null;
+      switch(type) {
+        case "email" :
+          if(!/^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$/.test(value)) {
+            error = "Invalid Email";
+          }
+          if(value.length > 40) error = "Please provide correct email";
+          break;
+        case "name" :
+          if(!value) error = "Please enter name";
+          if(value.length > 40) error = "Name is too long";
+          break;
+        case "password" :
+          if(!value) error = "Password Can't be empty";
+          if(value.length < 5) error = "Password must be atleast 5 characters long";
+          if(value.length > 50) error = "Password is too long";
+          break;
+        case "password2" :
+          if($('input-password').val() != value) error = "Password not matched";
+          break;
+      }
+
+      return error;
+    }
+
+    $("input").on("keyup", function(event) {
+      let type = event.target.name;
+      if(event.target.keyCode !== 13 && validationInput.includes(type)) {
+        const currentInputElement = $(`.input-${type}`);
+        let hasErrorClass = currentInputElement.hasClass('error');
+
+        let error = formValid(type, event.target.value);
+        if(error) {
+          if (!hasErrorClass) {
+              currentInputElement.addClass('error');
+          }
+          showError(type, error);
+        } else {
+          if(hasErrorClass) {
+            currentInputElement.removeClass('error');
+          }
+          if(!currentInputElement.hasClass('success')) {
+            currentInputElement.addClass('success');
+          }
+          hideError(type);
+        }
+      }
+
+      let submitError = submitFormError();
+      if(event.target.keyCode === 13) {
+        if(submitError) return showError(type, submitError);
+
+        return submitForm();
+      }
+
+      if(submitError) $("#submit-btn").addClass('disabled');
+      else $("#submit-btn").removeClass('disabled');
+    });
+
+    $("input").on("focusout", function(event) {
+      if(validationInput.includes(event.target.name)) {
+        $(`.input-${event.target.name}`).removeClass('success');
+      }
+    });
   </script>
 </body>
