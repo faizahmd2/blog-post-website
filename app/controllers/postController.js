@@ -13,11 +13,20 @@ exports.getAllPosts = async (req, res) => {
 
   const totalPosts = await Post.find().countDocuments();
 
-  const posts = await Post.find({
-    $or: [
+  let conditions;
+  if(req.user) {
+    conditions = [
       { user_id: req.user.user_id },
       { publicPost: true, user_id: { $ne: req.user.user_id } }
-    ]
+    ];
+  } else {
+    conditions = [
+      { publicPost: true }
+    ];
+  }
+
+  const posts = await Post.find({
+    $or: conditions
   })
     .sort('-created')
     .skip((page - 1) * postsPerPage)
