@@ -9,11 +9,16 @@ exports.homePage = async (req, res) => {
 
 exports.getAllPosts = async (req, res) => {
   const page = req.query.page || 1;
-  const postsPerPage = 3;
+  const postsPerPage = 100;
 
   const totalPosts = await Post.find().countDocuments();
 
-  const posts = await Post.find({})
+  const posts = await Post.find({
+    $or: [
+      { user_id: req.user.user_id },
+      { publicPost: true, user_id: { $ne: req.user.user_id } }
+    ]
+  })
     .sort('-created')
     .skip((page - 1) * postsPerPage)
     .limit(postsPerPage);
