@@ -11,7 +11,6 @@ exports.pageRender = function(req, res, page) {
     } else {
         options.user = null;
     }
-    console.log("RENDER -> ", page, req.user);
 
     res.render(page, options);
 }
