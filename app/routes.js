@@ -16,7 +16,6 @@ module.exports = function (app) {
   app.get('/posts/:id', postController.getPostByID);
   app.get('/posts', postController.getAllPosts);
   app.post('/posts', postController.createPost);
-  app.put('/posts/:id', postController.updatePost);
   app.delete('/posts/:id', postController.deletePost);
 
   app.get('/add_post', pageController.getAddPage);

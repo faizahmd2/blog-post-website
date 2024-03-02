@@ -51,45 +51,15 @@ exports.createPost = async (req, res) => {
   let uploadedImage = req.files.image;
   let uploadPath = path.resolve(__dirname,"../../public/uploads/",uploadedImage.name);
 
-  uploadedImage.mv(uploadPath, async () => {
+  // uploadedImage.mv(uploadPath, async () => {
     await Post.create({
       ...req.body,
       image: 'uploads/' + uploadedImage.name,
       publicPost: !!req.body.publicPost,
       created: Date.now()
     })
-  });
+  // });
   res.redirect('/');
-};
-
-exports.updatePost = async (req, res) => {
-  const post = await Post.findOne({_id: req.params.id});
-  if(req.body.title) {
-    post.title = req.body.title;
-  }
-
-  if(req.body.detail) {
-    post.detail = req.body.detail;
-  }
-
-  // If image exists, creates the image and removes the old one.
-  if(req.files && req.files.image) {
-
-    let oldImagePath = __dirname + '/../public' +  post.image;
-    fs.unlinkSync(oldImagePath);
-
-    let uploadPath = __dirname + '/../public/uploads/' + req.files.image.name;
-    req.files.image.mv(uploadPath);
-
-    post.image = '/uploads/' + req.files.image.name;
-  }
-
-  if(req.body.shortDescription) {
-    post.shortDescription = req.body.shortDescription;
-  }
-
-  post.save();
-  res.redirect(`/posts/${req.params.id}`);
 };
 
 exports.deletePost = async (req, res) => {
