@@ -1,6 +1,8 @@
 <%- include('partials/_header') -%>
+<link rel="stylesheet" href="css/post.css">
+
 <body>
-<%- include('partials/_navigation') -%>
+<%- include('partials/_navigation', { user }) -%>
   <!-- Page Header -->
   <header class="masthead" style="background-image: url('<%= post.image %>')">
     <div class="overlay"></div>

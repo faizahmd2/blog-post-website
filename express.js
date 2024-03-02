@@ -3,11 +3,11 @@
 let express = require('express');
 let config = require('./config/config');
 let cookieParser = require('cookie-parser');
-let sessionMiddleware = require('./config/middlewares/session')
-const { CustomError } = require('./config/middlewares/Error');
+const { errorTemplate } = require('./helper/util');
 const rateLimit = require("express-rate-limit");
 const fileUpload = require('express-fileupload');
 const methodOverride = require('method-override');
+const { userTokenInfo } = require('./config/middlewares/auth')
 
 module.exports = function(app, passport) {
     console.log('Initializing Express');
@@ -43,9 +43,8 @@ module.exports = function(app, passport) {
             methods: ['POST', 'GET'],
         })
     );
+    app.use(userTokenInfo)
 
-    //set public static path and set view engine to ejs
-    // app.set('views', config.root + '/public/views');
     app.set("view engine", "ejs");
 
     //cookieParser above session
@@ -54,19 +53,11 @@ module.exports = function(app, passport) {
     // Rate Limit
     // app.use(rateLimit(config.RATE_LIMIT || 10));
 
-    //express session configuration
-    app.use(sessionMiddleware);
-
-    //use passport session
     app.use(passport.initialize());
-    app.use(passport.session());
-
-    // app.use(express.static('public')); 
-    // app.use('/images', express.static('images'));
 
     require('./app/routes')(app);
 
     app.get('*',  function (req, res) {
-        new CustomError(res);
+        errorTemplate(res);
     });
 };

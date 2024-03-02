@@ -1,8 +1,13 @@
 const passport = require('passport'),
   bcrypt = require("bcryptjs");
 const Login = require('../models/Login');
+const { sign } = require('../../config/middlewares/jwt');
+const { sendResponse, pageRender } = require('../../helper/util');
 
 module.exports = {
+  session: function(req, res) {
+    res.sendStatus(204);
+  },
   signout: function(req, res, next) {
     req.logout(function(err) {
       req.session.destroy(function(err) {
@@ -14,11 +19,11 @@ module.exports = {
     try {
         let { name, email, password, phone, address, pincode, additionals={} } = req.body;
         if (!email || !password || !name) {
-          return res.status(400).json({status:0,message:'Please provide all fields'});
+          return sendResponse(res, 400, 'Please provide all fields');
         }
     
         //Check if user exists
-        const resp = await _verifyUser({email});
+        const resp = await helper.verifyUser({email});
     
         if (resp && resp == 'Unknown User') {
           //Hash password
@@ -26,7 +31,8 @@ module.exports = {
           const hashedPassword = await bcrypt.hash(password, salt);
           
           let loginObj = {
-            _id: 1,
+            name,
+            initial: helper.generateInitials(name),
             email:email,
             password: hashedPassword,
             created: new Date()
@@ -39,45 +45,57 @@ module.exports = {
 
           const loginResp = await Login.create(loginObj);
           if (loginResp) {
-            return res.status(201).json({
-                status:1,
-                id: loginResp.uuid,
-                email: loginResp.email
-            });
+            return res.sendStatus(201);
           }
         } else if(resp.user) {
-            return res.status(400).json({status:0,message:'Email Already Registerd'});
+          return sendResponse(res, 400, 'Email Already Registerd');
         }
 
-        res.status(400).json({status:0,message:'Could Not Create User'});
+        sendResponse(res, 400, 'Could Not Create User');
     } catch (error) {
         console.error(error);
-        res.status(500).json({status:0,message:'Something Went Wrong'});
+        sendResponse(res, 500);
     }
   },
   loginUser: async (req, res) => {
     try {
         let {email, password} = req.body;
-        if(!email || !password) return res.status(403).json({status:0, message: "Email or Password Missing"});
+        if(!email || !password) return sendResponse(res, 400, 'Email or Password Missing');
         passport.authenticate('local', (err, user) => {
-          if(user) return res.json({
-            status: 1,
-            userDetalis: {id: user.id, email: user.email}
-          });
-          res.status(403).json({status:0, message: "Invalid Username Or Password"});
+          if (user) {
+            const token = sign({user_id: user._id, initial: user.initial});
+            return res.json({
+                token: token
+            });
+          }
+          sendResponse(res, 400, 'Invalid Username Or Password');
         })({ body: { email, password } });
     } catch (error) {
         console.error(error);
-        res.status(500).json({status:0,message:'Something Went Wrong'});
+        sendResponse(res, 500);
     }
   },
   renderLogin: (req, res) => {
     let isSignup = req.query.register == "1";
-    res.render("login", { isSignup });
+
+    req.options = { isSignup };
+    pageRender(req, res, "login");
   }
 };
 
-async function _verifyUser(condition) {
+var helper = {
+  generateInitials: function(input) {
+    const names = input.split(' ');
+    let initials = names[0].charAt(0).toUpperCase();
+    if (names.length > 1) {
+        const secondInitial = names[1].charAt(0).toUpperCase();
+        initials += (secondInitial !== '' ? secondInitial : names[0].charAt(1).toUpperCase());
+    } else {
+        initials += names[0].charAt(1).toUpperCase();
+    }
+    return initials;
+  },
+  verifyUser: async function(condition) {
     try{
       let user = await Login.findOne(condition);
       if (!user) {
@@ -89,4 +107,5 @@ async function _verifyUser(condition) {
         console.error(err)
         return JSON.stringify(err);
     }
+  }
 }

@@ -1,9 +1,10 @@
 const Post = require('../models/Post');
 const fs = require('fs');
-const path = require('path')
+const path = require('path');
+const { pageRender } = require('../../helper/util');
 
 exports.homePage = async (req, res) => {
-  res.render('index');
+  pageRender(req, res, 'index');
 }
 
 exports.getAllPosts = async (req, res) => {
@@ -17,19 +18,22 @@ exports.getAllPosts = async (req, res) => {
     .skip((page - 1) * postsPerPage)
     .limit(postsPerPage);
 
-  res.render('posts', {
+  
+  req.options = {
     posts: posts,
     current: page,
     pages: Math.ceil(totalPosts / postsPerPage),
-    totalPosts
-  });
+    totalPosts,
+    user: req.user
+  };
+  pageRender(req, res, 'posts');
 };
 
 exports.getPostByID = async (req, res) => {
   const post = await Post.findById(req.params.id);
-  res.render('post', {
-    post
-  });
+
+  req.options = { post };
+  pageRender(req, res, 'post');
 };
 
 exports.createPost = async (req, res) => {

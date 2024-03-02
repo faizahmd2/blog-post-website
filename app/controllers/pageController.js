@@ -1,5 +1,6 @@
-const Post = require('../models/Post');
+const { pageRender } = require('../../helper/util');
+// const Post = require('../models/Post');
 
 exports.getAddPage = (req, res) => {
-  res.render('add_post');
+  pageRender(req, res, 'add_post');
 };

@@ -1,0 +1,35 @@
+.posts .card-img-top {
+    height: 150px;
+    object-fit: cover;
+}
+.posts .card-body {
+    min-height: 90px;
+}
+.posts .card-title {
+    font-weight: bold;
+}
+.posts .card-text {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+}
+.posts .card:hover {
+    box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.5);
+}
+
+.posts .card {
+    cursor: pointer;
+}
+
+.posts .btn {
+    padding: 9px 17px;
+}
+
+.posts .search {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+}

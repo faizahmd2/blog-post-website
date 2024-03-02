@@ -1,7 +1,8 @@
 <%- include('partials/_header') -%>
 <link rel="stylesheet" href="css/login.css">
+
 <body style="overflow-x: hidden;">
-  <%- include('partials/_navigation') -%>
+  <%- include('partials/_navigation', { user }) -%>
   <div class="background">
     <div class="background-image"></div>
     <div class="login full-screen-container large-screen-container">
@@ -85,18 +86,37 @@
     </div>
   </div>
 
-  <script src="vendor/jquery/jquery.min.js"></script>
-  <script src="vendor/bootstrap/js/bootstrap.min.js"></script>
-  <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.21/lodash.min.js"></script> -->
-  <script src="js/login.js"></script>
-  <script src="js/utility.js"></script>
+  <!-- Jquery Js -->
+  <!-- <script src="vendor/jquery/jquery.min.js"></script> -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
+  <!-- Bootstrap Js -->
+  <!-- <script src="vendor/bootstrap/js/bootstrap.min.js"></script> -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/4.5.3/js/bootstrap.min.js" integrity="sha512-8qmis31OQi6hIRgvkht0s6mCOittjMa9GMqtK9hes5iEQBQE/Ca6yGE5FsW36vyipGoWQswBj/QBm2JR086Rkw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  
+  <!-- Notyf Js -->
+  <!-- <script src="vendor/notyf/notyf.min.js"></script> -->
+  <script src="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.js"></script>
+  
+  <!-- Main JS -->
+  <script src="js/utility.js"></script>
   <script>
     let validationInput;
 
     init();
 
-    function init() {
+    async function init() {
+      console.log("CALLING INIT",localStorage.getItem('token'))
+      // check for previous session
+      if(localStorage.getItem("token")) {
+        let response = await fetchData('/session');
+        console.log("SESSION:::",response);
+        if(response.status == 204) {
+          window.location.href = '/';
+          return;
+        }
+      }
+
       if(isSignup()) {
         validationInput = ["name", "email", "password", "password2"];
       } else {
@@ -115,8 +135,20 @@
       let isLogin = !isSignup();
 
       let response = await fetchData(isLogin ? '/login' : '/signup', 'POST', formData);
-      console.log("METHOD",isLogin);
-      console.log("response",response);
+
+      if(isLogin) {
+        if(response.error) return notify.error(response.error);
+        if(!response.token) return notify.error("Error logging in");
+        notify.success("Logged In Successfully!");
+        localStorage.setItem('token', response.token);
+        setTimeout(() => {
+          window.location.href = '/';
+        }, 2000)
+      } else {
+        if(response.status != 201) return notify.error("Could Not Register User!");
+        notify.success("Registered!! Please Login");
+        toggleSigningMethod();
+      }
     }
 
     function getFormData(reset) {
@@ -183,15 +215,15 @@
     }
 
     function togglePasswordVisibility(type) {
-      let imgClass = "icon-" + type;
-      let inputClass = "input-" + type;
+      let imgClass = ".icon-" + type;
+      let inputClass = ".input-" + type;
 
       if($(inputClass).attr('type') === 'password') {
-        $(inputClass).attr('type', 'password');
-        $(imgClass).attr('src', '/img/icons/invisible.png');
-      } else {
         $(inputClass).attr('type', 'text');
         $(imgClass).attr('src', '/img/icons/visible.png');
+      } else {
+        $(inputClass).attr('type', 'password');
+        $(imgClass).attr('src', '/img/icons/invisible.png');
       }
     }
 

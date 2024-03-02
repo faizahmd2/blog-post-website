@@ -17,10 +17,37 @@
                 <li class="nav-item">
                     <a class="nav-link" href="/add_post">Add New Post</a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/login">Sign In</a>
+                <li class="nav-item" style="position: relative;">
+                    <% if(user){ %>
+                        <div class="user-icon">
+                            <span class="user-initials"><%= user.initial || 'NA' %></span>
+                        </div>
+                        <div class="dd-menu" id="navigationUserMenu">
+                            <a href="/profile" class="dd-menu-item">Profile</a>
+                            <hr>
+                            <a href="/logout" class="dd-menu-item">Logout</a>
+                        </div>
+                     <% } %>
+                     <% if(!user) { %>
+                        <a class="nav-link" href="/login">Sign In</a>
+                     <% } %>
                 </li>
             </ul>
         </div>
     </div>
 </nav>
+<script>
+    $('.user-icon').on("click", function(e) {
+        e.stopPropagation();
+        const target = $("#navigationUserMenu");
+        if (target.css('display') === 'none' || target.css('display') === '') {
+            target.css('display', 'flex');
+        } else {
+            target.css('display', 'none');
+        }
+    })
+
+    $("body").on("click", function() {
+        $("#navigationUserMenu").hide();
+    })
+</script>

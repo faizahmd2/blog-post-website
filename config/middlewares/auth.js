@@ -1,15 +1,44 @@
-const config = require('../config')
+const { sendResponse } = require('../../helper/util');
+const { verify } = require('./jwt');
 
 var exportAuth = {
-    requiresLogin: function (req, res, next) {
-        if(config.isAuthenticationEnabled && !req.isAuthenticated()) {
-            return res.status(403).send({
-                message: 'User is not Authenticated'
-            })
-        } else {
-            next()
+    requireLogin: function(req, res, next) {
+        if(!req.user) {
+            sendResponse(res, 401, req.tokenMessage || 'User is not Authenticated');
+        }
+    },
+    userTokenInfo: function(req, res, next) {
+        const authHeader = req.headers['authorization'];
+        console.log("MIDDLEware calling", authHeader);
+        if(!authHeader) {
+            req.tokenMessage = 'Authorization Required';
+            return next();
+        }
+
+        const token = authHeader.split(' ')[1];
+        if (!token) {
+            req.tokenMessage = 'Invalid Authorization';
+            return next();
+        }
+    
+        try {
+            let result = verify(token);
+
+            req.user = result;
+
+            next();
+        } catch (error) {
+            console.log("catche error auth token valiation:",error);
+            if (error.name === "TokenExpiredError") {
+                eq.tokenMessage = 'Token expired';
+                return next();
+            }
+
+            eq.tokenMessage = 'Invalid token';
+            return next();
         }
     }
+    
 }
 
 module.exports = exportAuth;
