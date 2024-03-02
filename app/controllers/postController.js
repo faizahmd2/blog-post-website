@@ -57,18 +57,20 @@ exports.createPost = async (req, res) => {
     fs.mkdirSync(uploadDir);
   }
 
-  let uploadedImage = req.files.image;
-  let uploadPath = path.resolve(__dirname,"../../public/uploads/",uploadedImage.name);
+  // let uploadedImage = req.files.image;
+  // let uploadPath = path.resolve(__dirname,"../../public/uploads/",uploadedImage.name);
 
   // uploadedImage.mv(uploadPath, async () => {
     await Post.create({
-      ...req.body,
-      image: 'uploads/' + uploadedImage.name,
+      title: req.body.title || "NA",
+      detail: req.body.detail || "",
+      shortDescription: req.body.shortDescription || "",
+      // image: 'uploads/' + uploadedImage.name,
       publicPost: !!req.body.publicPost,
       created: Date.now()
     })
   // });
-  res.redirect('/');
+  pageRender(req, res, 'index');
 };
 
 exports.deletePost = async (req, res) => {

@@ -6,6 +6,7 @@ var exportAuth = {
         if(!req.user) {
             sendResponse(res, 401, req.tokenMessage || 'User is not Authenticated');
         }
+        next();
     },
     userTokenInfo: function(req, res, next) {
         const token = req.cookies && req.cookies.token;
