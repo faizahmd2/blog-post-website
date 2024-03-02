@@ -29,7 +29,7 @@
                         </div>
                      <% } %>
                      <% if(!user) { %>
-                        <a class="nav-link" href="/login">Sign In</a>
+                        <a class="nav-link" href="/login">Login</a>
                      <% } %>
                 </li>
             </ul>
@@ -50,4 +50,9 @@
     $("body").on("click", function() {
         $("#navigationUserMenu").hide();
     })
+
+    function logoutt() {
+        // document.cookie = 'token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+        // $.cookie("token", null, { path: '/' });
+    }
 </script>

@@ -10,7 +10,8 @@ const LoginSchema = new Schema({
     phone: Number,
     address: String,
     pincode: Number,
-    additionals: Schema.Types.Mixed,
+    message: String,
+    age: String,
     created: {
         type: Date
     },

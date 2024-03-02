@@ -8,14 +8,7 @@ var exportAuth = {
         }
     },
     userTokenInfo: function(req, res, next) {
-        const authHeader = req.headers['authorization'];
-        console.log("MIDDLEware calling", authHeader);
-        if(!authHeader) {
-            req.tokenMessage = 'Authorization Required';
-            return next();
-        }
-
-        const token = authHeader.split(' ')[1];
+        const token = req.cookies && req.cookies.token;
         if (!token) {
             req.tokenMessage = 'Invalid Authorization';
             return next();

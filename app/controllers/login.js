@@ -3,27 +3,33 @@ const passport = require('passport'),
 const Login = require('../models/Login');
 const { sign } = require('../../config/middlewares/jwt');
 const { sendResponse, pageRender } = require('../../helper/util');
+const config = require('../../config/config');
 
 module.exports = {
-  session: function(req, res) {
-    res.sendStatus(204);
-  },
-  signout: function(req, res, next) {
-    req.logout(function(err) {
-      req.session.destroy(function(err) {
-        res.send({status: 1,'message': "Done!!"})
-      })
-    });
+  logout: function(req, res, next) {
+    res.clearCookie('token');
+    req.user = null;
+    pageRender(req, res, 'index');
   },
   registerUser: async (req, res) => {
     try {
-        let { name, email, password, phone, address, pincode, additionals={} } = req.body;
-        if (!email || !password || !name) {
-          return sendResponse(res, 400, 'Please provide all fields');
+        let { name, email, password, password2, phone, address, pincode, age, message } = req.body;
+        if (
+          !email || 
+          !password || 
+          !name ||
+          !/^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$/.test(email) ||
+          password != password2 ||
+          name.length > 40 ||
+          email.length > 40 ||
+          password.length < 5 ||
+          password.length > 50
+          ) {
+          return sendResponse(res, 400, 'Malformed Request');
         }
     
         //Check if user exists
-        const resp = await helper.verifyUser({email});
+        const resp = await helper.verifyUser({email, status: 1});
     
         if (resp && resp == 'Unknown User') {
           //Hash password
@@ -35,13 +41,15 @@ module.exports = {
             initial: helper.generateInitials(name),
             email:email,
             password: hashedPassword,
+            status: 1,
             created: new Date()
           };
           
           if(phone) loginObj.phone = phone;
           if(address) loginObj.address = address;
-          if(pincode) loginObj.pincode = pincode;
-          if(Object.keys(additionals).length) loginObj.misc = JSON.stringify(additionals);
+          if(pincode) loginObj.pincode = +pincode;
+          if(age) loginObj.age = age;
+          if(message) loginObj.message = message;
 
           const loginResp = await Login.create(loginObj);
           if (loginResp) {
@@ -64,8 +72,9 @@ module.exports = {
         passport.authenticate('local', (err, user) => {
           if (user) {
             const token = sign({user_id: user._id, initial: user.initial});
+            res.cookie('token', token, { maxAge: config.LOGIN_COOKIE_EXPIRY, httpOnly: true });
             return res.json({
-                token: token
+                success: true
             });
           }
           sendResponse(res, 400, 'Invalid Username Or Password');

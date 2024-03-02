@@ -9,8 +9,7 @@ module.exports = function (app) {
   app.get('/login', login.renderLogin);
   app.post('/login', login.loginUser);
   app.post('/signup', login.registerUser);
-  app.get('/session', auth.requireLogin, login.session);
-  app.get('/signout', auth.requireLogin, login.signout);
+  app.get('/logout', login.logout);
   
   //ROUTES
   app.get('/', postController.homePage);

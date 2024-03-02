@@ -63,7 +63,7 @@
                 <textarea name="message" cols="5" rows="4" placeholder="Message"></textarea>
               </div>
             </div>
-            <div class="additional" style="display: none;">
+            <div class="additional">
               <img class="additional-icon" src="/img/icons/slide-down.png" alt="" onclick="toggleAdditionalFields()">
               <span>Add Additional Details</span>
             </div>
@@ -85,38 +85,15 @@
       </div>
     </div>
   </div>
-
-  <!-- Jquery Js -->
-  <!-- <script src="vendor/jquery/jquery.min.js"></script> -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-
-  <!-- Bootstrap Js -->
-  <!-- <script src="vendor/bootstrap/js/bootstrap.min.js"></script> -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/4.5.3/js/bootstrap.min.js" integrity="sha512-8qmis31OQi6hIRgvkht0s6mCOittjMa9GMqtK9hes5iEQBQE/Ca6yGE5FsW36vyipGoWQswBj/QBm2JR086Rkw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-  
-  <!-- Notyf Js -->
-  <!-- <script src="vendor/notyf/notyf.min.js"></script> -->
-  <script src="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.js"></script>
   
   <!-- Main JS -->
   <script src="js/utility.js"></script>
   <script>
-    let validationInput;
+    let validationInput = [];
 
     init();
 
     async function init() {
-      console.log("CALLING INIT",localStorage.getItem('token'))
-      // check for previous session
-      if(localStorage.getItem("token")) {
-        let response = await fetchData('/session');
-        console.log("SESSION:::",response);
-        if(response.status == 204) {
-          window.location.href = '/';
-          return;
-        }
-      }
-
       if(isSignup()) {
         validationInput = ["name", "email", "password", "password2"];
       } else {
@@ -136,11 +113,11 @@
 
       let response = await fetchData(isLogin ? '/login' : '/signup', 'POST', formData);
 
+      if(response.error) return notify.error(response.error);
+      
       if(isLogin) {
-        if(response.error) return notify.error(response.error);
-        if(!response.token) return notify.error("Error logging in");
+        if(!response.success) return notify.error("Could Not Login!");
         notify.success("Logged In Successfully!");
-        localStorage.setItem('token', response.token);
         setTimeout(() => {
           window.location.href = '/';
         }, 2000)
@@ -160,13 +137,16 @@
             dta[this.name] = $(this).val();
           }
       });
-      $('textarea').each(function() {
+
+      if(isSignup()) {
+        $('textarea').each(function() {
           if(reset) {
             $(this).val('');
           } else {
             dta[this.name] = $(this).val();
           }
-      });
+        });
+      }
 
       if(!reset) return dta;
     }
@@ -194,10 +174,11 @@
     function isAdditional() {
       if(!isSignup()) return null;
 
-      if ($('.additional-fields').css('display') !== 'none') {
-        return true;
-      } else {
+      const target = $('.additional-fields');
+      if (target.css('display') === 'none' || target.css('display') === '') {
         return false;
+      } else {
+        return true;
       }
     }
 
@@ -284,10 +265,13 @@
 
     function formValid(type, value) {
       let error = null;
+      let signup = isSignup();
       switch(type) {
         case "email" :
-          if(!/^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$/.test(value)) {
+          if(signup && !/^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$/.test(value)) {
             error = "Invalid Email";
+          } else if(!value) {
+            error = "Email Required";
           }
           if(value.length > 40) error = "Please provide correct email";
           break;
@@ -297,11 +281,13 @@
           break;
         case "password" :
           if(!value) error = "Password Can't be empty";
-          if(value.length < 5) error = "Password must be atleast 5 characters long";
-          if(value.length > 50) error = "Password is too long";
+          if(signup) {
+            if(value.length < 5) error = "Password must be atleast 5 characters long";
+            if(value.length > 50) error = "Password is too long";
+          }
           break;
         case "password2" :
-          if($('input-password').val() != value) error = "Password not matched";
+          if($('.input-password').val() != value) error = "Password not matched";
           break;
       }
 
@@ -324,7 +310,7 @@
           if(hasErrorClass) {
             currentInputElement.removeClass('error');
           }
-          if(!currentInputElement.hasClass('success')) {
+          if(isSignup() && !currentInputElement.hasClass('success')) {
             currentInputElement.addClass('success');
           }
           hideError(type);

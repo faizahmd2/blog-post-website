@@ -43,17 +43,17 @@ module.exports = function(app, passport) {
             methods: ['POST', 'GET'],
         })
     );
+    app.use(cookieParser())
+    
+    app.use(passport.initialize());
     app.use(userTokenInfo)
 
     app.set("view engine", "ejs");
 
-    //cookieParser above session
-    app.use(cookieParser())
 
     // Rate Limit
     // app.use(rateLimit(config.RATE_LIMIT || 10));
 
-    app.use(passport.initialize());
 
     require('./app/routes')(app);
 

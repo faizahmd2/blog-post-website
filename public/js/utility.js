@@ -15,6 +15,11 @@ function parseSearchQuery() {
     return params;
 }
 
+function logout() {
+  document.cookie = 'token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+  window.location.href = '/logout';
+}
+
 function fetchData(endpoint, method = "GET", body) {
   return new Promise((resolve, reject) => {
     const fetchOptions = {
@@ -24,8 +29,8 @@ function fetchData(endpoint, method = "GET", body) {
       }
     };
 
-    let token = localStorage.getItem("token");
-    if(token) fetchOptions.headers["Authorization"] = `Bearer ${token}`;
+    // let token = localStorage.getItem("token");
+    // if(token) fetchOptions.headers["Authorization"] = `Bearer ${token}`;
     
     if(body) fetchOptions.body = JSON.stringify(body);
 
@@ -34,16 +39,13 @@ function fetchData(endpoint, method = "GET", body) {
       .then(response => {
         status = response.status;
         if (!response.ok) {
-          console.log("HTTP", status,endpoint);
-          if(status == 401 && endpoint != "/session") {
-            localStorage.clear();
-            window.location.reload();
+          if(status == 401) {
+            logout();
             return resolve({});
           }
         }
 
         const contentType = response.headers.get('content-type');
-        console.log("contentType===>",contentType);
         if (contentType && contentType.includes('application/json')) {
           return response.json();
         } else {
