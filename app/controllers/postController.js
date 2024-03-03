@@ -32,9 +32,13 @@ exports.getAllPosts = async (req, res) => {
     .skip((page - 1) * postsPerPage)
     .limit(postsPerPage);
 
+    let finalPosts = [];
+    for(let i=0; i<=50; i++) {
+      finalPosts = finalPosts.concat(posts);
+    }
   
   req.options = {
-    posts: posts,
+    posts: finalPosts,
     current: page,
     pages: Math.ceil(totalPosts / postsPerPage),
     totalPosts,

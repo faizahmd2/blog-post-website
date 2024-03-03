@@ -1,38 +1,47 @@
 <%- include('partials/_header') -%>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/simplePagination.js/1.6/simplePagination.min.css" integrity="sha512-m3x+GduGUoEMGB6dywpah/mAG3GafMmxmByGLqKfZFF8xr6THjjOcH0OWV1rLBFiZMotecZxWhRz0lVlVNl72w==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 <link rel="stylesheet" href="css/posts.css">
 
-<body>
+<body class="background-image" style="overflow: hidden;">
 <%- include('partials/_navigation', { user }) -%>
-  <!-- Page Header -->
-  <header class="masthead">
-    <div class="overlay"></div>
-    <div class="nav-strip"></div>
-  </header>
 
-  <div class="container mt-5 posts">
+  <div class="posts">
     <div class="input-group mb-3 search">
       <input type="text" class="form-control" placeholder="Search..." aria-label="Search" aria-describedby="button-addon2">
       <button class="btn btn-outline-secondary" type="button" id="button-addon2">Search</button>
     </div>
     <div class="posts-container">
-      <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-1">
+      <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-1">
         <% posts.forEach(post => { %>
           <div class="col">
-              <div class="card mb-4">
-                  <img src="<%= post.image %>" class="card-img-top" alt="...">
-                  <div class="card-body">
-                      <h5 class="card-title"><%= post.title %></h5>
-                      <p class="card-text"><%= post.detail.slice(0, 172) + (post.detail.length > 172 ? "..." : "") %></p>
-                  </div>
+              <div class="card mb-2">
+                  <!-- <img src="<%= post.image %>" class="card-img-top" alt="..."> -->
+                  <h5 class="card-title"><%= post.title %></h5>
+                  <p class="card-text"><%= post.detail.slice(0, 172) + (post.detail.length > 172 ? "..." : "") %></p>
+                  <!-- <div class="card-body">
+                  </div> -->
               </div>
           </div>
         <% }); %>
       </div>
     </div>
   </div>
+  <div class="pagination-container">
+    <div id="pagination"></div>
+  </div>
 
-  <hr>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/simplePagination.js/1.6/jquery.simplePagination.min.js" integrity="sha512-9Dh726RTZVE1k5R1RNEzk1ex4AoRjxNMFKtZdcWaG2KUgjEmFYN3n17YLUrbHm47CRQB1mvVBHDFXrcnx/deDA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script>
+    $(document).ready(function(){
+    // Initialize pagination
+    const cards = [{image:'', title:"titleee",description:"description"}];
+    $('#pagination').pagination({
+      items: 100,
+      itemsOnPage: 5,
+      cssStyle: 'light-theme'
+    });
+  });
+  </script>
 </body>
-<%- include('partials/_footer') -%>
 
 
