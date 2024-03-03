@@ -114,3 +114,45 @@ const notify = {
     });
   }
 }
+
+function getCookie(name) {
+  if(!document.cookie) return null;
+  
+  const allCookies = document.cookie.split(';');
+  for (const cookie of allCookies) {
+    const [cookieName, cookieValue] = cookie.trim().split('=');
+    if (cookieName === name) {
+      return cookieValue;
+    }
+  }
+  return null;
+}
+
+function deviceInfo() {
+  let deviceInfo = {};
+  deviceInfo['mobile'] = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
+  if(deviceInfo['mobile']) {
+    deviceInfo['screen'] = window.innerWidth > window.innerHeight ? 'landscape' : 'portrait';
+  }
+  return deviceInfo;
+}
+
+// TODO: Handle add post page on mobile device orientation
+// function deviceOrientationEvent() {
+//   $(window).on("orientationchange", function(event) {
+//     // Code to handle orientation change
+//     if (window.orientation === 0) {
+//         // Portrait orientation
+//         console.log("Device is in portrait orientation");
+//     } else {
+//         // Landscape orientation
+//         console.log("Device is in landscape orientation");
+//     }
+//   });
+// }
+
+// Function to detect device orientation (portrait or landscape)
+function getOrientation() {
+  return window.innerWidth > window.innerHeight ? 'landscape' : 'portrait';
+}

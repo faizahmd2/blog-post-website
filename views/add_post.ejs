@@ -1,55 +1,182 @@
 <%- include('partials/_header') -%>
+<!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/quill/1.3.7/quill.snow.min.css" integrity="sha512-/FHUK/LsH78K9XTqsR9hbzr21J8B8RwHR/r8Jv9fzry6NVAOVIGFKQCNINsbhK7a1xubVu2r5QZcz2T9cKpubw==" crossorigin="anonymous" referrerpolicy="no-referrer" /> -->
+<link rel="stylesheet" href="vendor/quillJs/css/quill.snow.min.css">
 <link rel="stylesheet" href="css/add_post.css">
 
-<body>
+<body class="background-image">
 <%- include('partials/_navigation', { user }) -%>
-  <!-- Page Header -->
-  <header class="masthead">
-    <div class="overlay"></div>
-    <div class="nav-strip"></div>
-  </header>
 
-  <!-- Main Content -->
-  <div class="container">
-    <div class="row">
-      <div class="col-lg-8 col-md-10 mx-auto">
-        <form method="post" action="/posts" class="control-group" encType="multipart/form-data">
-          <!--<div class="control-group">-->
-            <div class="form-group floating-label-form-group controls">
-              <label>Post Title</label>
-              <input type="text" name="title" class="form-control" placeholder="Post Title" required data-validation-required-message="Please enter post title">
-              <p class="help-block text-danger" style="margin: 0;"></p>
-            </div>
-         <!-- </div>-->
-          <div class="control-group">
-            <div class="form-group floating-label-form-group controls">
-              <label>Post Description</label>
-              <textarea rows="5" name="detail" class="form-control" placeholder="Post Description" required data-validation-required-message="Please enter post description"></textarea>
-              <p class="help-block text-danger"></p>
-            </div>
-          </div>
-          <div class="form-group floating-label-form-group controls">
-            <label>Add Photo</label>
-            <input type="file" name="image" class="form-control" >
-            <p class="help-block text-danger" style="margin: 0;"></p>
-          </div>
-          <div class="form-group floating-label-form-group controls">
-            <label>Short Description</label>
-            <input type="text" name="shortDescription" class="form-control" placeholder="Short Description">
-            <p class="help-block text-danger"></p>
-          </div>
-          <div class="consent-public-check form-check">
-            <input type="checkbox" class="form-check-input" id="publicPost" name="publicPost">
-            <label class="form-check-label" for="publicPost">Public Post</label>
-          </div>   
-          <br>
-          <div id="success"></div>
-          <button type="submit" class="btn btn-primary" id="sendMessageButton">Send</button>
-        </form>
+
+  <div class="form-container">
+    <div class="form-group floating-label-form-group">
+      <input type="text" name="title" class="form-control" placeholder="Title..." required data-validation-required-message="Please enter post title">
+    </div>
+    <div class="editor-container">
+      <div id="editor"></div>
+    </div>
+    <div class="bottom-actions">
+      <div class="left-actions consent-public-check form-check">
+        <input type="checkbox" class="form-check-input" id="publicPost" name="publicPost">
+        <label class="form-check-label" for="publicPost">Public Post</label>
+      </div>
+      <div class="right-actions">
+        <button class="btn btn-primary" onclick="resetForm()">Reset</button>
+        <button type="submit" class="btn btn-primary" disabled onclick="submitForm()">Send</button>
       </div>
     </div>
   </div>
+  <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/quill/1.3.7/quill.min.js" integrity="sha512-P2W2rr8ikUPfa31PLBo5bcBQrsa+TNj8jiKadtaIrHQGMo6hQM6RdPjQYxlNguwHz8AwSQ28VkBK6kHBLgd/8g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script> -->
+  <script src="vendor/quillJs/js/quill.min.js"></script>
 
-  <hr>
-<%- include('partials/_footer') -%>
+  <!-- utility JS -->
+  <script src="js/utility.js"></script>
+  <script>
+    var editor;
+    $(document).ready(function() {
+      const toolbarOptions = getToolbarOptions();
+
+      editor = new Quill('#editor', {
+        modules: {
+          toolbar: toolbarOptions
+        },
+        theme: 'snow'
+      });
+      
+      editor.on('text-change', function() {
+        const currentContent = JSON.stringify(editor.getContents());
+        localStorage.setItem('post_cached_content', currentContent);
+      });
+
+      $("input[name='title']").on("input", function(e) {
+        console.log("title input change",$("input[name='title']").val());
+        localStorage.setItem('post_cached_title', $("input[name='title']").val());
+      });
+
+      $("input[name='publicPost']").change(function(e) {
+        console.log("public input change",$("input[name='publicPost']").prop("checked"),typeof $("input[name='publicPost']").prop("checked"));
+        localStorage.setItem('post_cached_publicPost', $("input[name='publicPost']").prop("checked"));
+      });
+      
+      setCacheDataOnLoad();
+
+      $("button[type='submit']").prop("disabled", false);
+
+    });
+
+    function setCacheDataOnLoad() {
+      loadContentFromLocalStorage();
+      let title = localStorage.getItem('post_cached_title');
+      let publicPost = localStorage.getItem('post_cached_publicPost');
+      if(title) {
+        $("input[name='title']").val(title);
+      }
+      if (publicPost) {
+        if(publicPost == "true") publicPost = true;
+        else publicPost = false;
+        $("input[name='publicPost']").prop("checked", publicPost);
+      }
+    }
+
+    async function submitForm() {
+      let formData = getFormData();
+
+      let validationError = formValidationError(formData);
+
+      if(validationError) return notify.error(validationError);
+
+      let response = await fetchData('/add-post', 'POST', formData);
+
+      if(response.error) return notify.error(response.error);
+
+      if(!response.success) return notify.error("Some error occured");
+
+      resetForm();
+
+      notify.success("Post Added Successfully!");
+
+      setTimeout(() => {
+        window.location.href = "/posts";
+      },1000);
+    }
+
+    function loadContentFromLocalStorage() {
+      const savedContent = localStorage.getItem('post_cached_content');
+      if (savedContent) {
+        try {
+          const parsedContent = JSON.parse(savedContent);
+          editor.setContents(parsedContent); 
+        } catch (error) {
+          console.error('Error parsing stored content:', error);
+        }
+      }
+    }
+
+    function resetForm () {
+      editor.setText('');
+      $("input[name='title']").val('');
+      $("input[name='publicPost']").prop("checked", false);
+      localStorage.removeItem('post_cached_content');
+      localStorage.removeItem('post_cached_title');
+      localStorage.removeItem('post_cached_publicPost');
+    }
+
+    function formValidationError(data) {
+      if(!data.title || data.title == "") return "Title is Required";
+
+      if(!data.plainTextContent || data.plainTextContent == "" || data.plainTextContent.length <= 1) return "Please add post content";
+
+      return null;
+    }
+
+    function getFormData() {
+      let content = editor.root.innerHTML;
+      const plainTextContent = editor.getText(0, editor.getLength());
+      console.log(content);
+      console.log("--------");
+      console.log(plainTextContent);
+      const currentContent = JSON.stringify(editor.getContents());
+      console.log(currentContent);
+
+      const title = $("input[name='title']").val();
+      const publicPost = $("input[name='publicPost']").prop("checked");
+
+      return {title, content, plainTextContent, publicPost};
+    }
+
+    function getToolbarOptions() {
+      const device = deviceInfo();
+      console.log("device===",device);
+      notify.success(JSON.stringify(device));
+      if(device.mobile) {
+        // Mobile configuration
+        return [
+          ['bold', 'italic', 'underline', 'strike'],        // toggled buttons
+          [{ 'align': [] }],
+          ['blockquote', 'code-block'],
+          ['link'],
+          [{ 'list': 'bullet' }],
+          [{ 'size': ['small', false, 'large', 'huge'] }],
+          [{ 'color': [] }, { 'background': [] }],
+          [{ 'font': [] }]
+        ];
+      } else {
+        return [
+          ['bold', 'italic', 'underline', 'strike'],        // toggled buttons
+          [{ 'align': [] }],
+          ['blockquote', 'code-block'],
+          ['link','formula'],
+          [{ 'list': 'ordered'}, { 'list': 'bullet' }, { 'list': 'check' }],
+          [{ 'script': 'sub'}, { 'script': 'super' }],      // superscript/subscript
+          [{ 'indent': '-1'}, { 'indent': '+1' }],          // outdent/indent
+          [{ 'direction': 'rtl' }],                         // text direction
+          [{ 'size': ['small', false, 'large', 'huge'] }],  // custom dropdown
+          [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+          [{ 'color': [] }, { 'background': [] }],          // dropdown with defaults from theme
+          [{ 'font': [] }],
+          ['clean']                                         // remove formatting button
+        ];
+      }
+    }
+
+  </script>
 </body>
