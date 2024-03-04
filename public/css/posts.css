@@ -16,6 +16,12 @@
     padding: 4px 8px;
 }
 
+.pagination-container {
+    display: flex;
+    justify-content: flex-end;
+    margin: 0.5em 1vw 0px;
+}
+
 .posts .card-img-top {
     height: 150px;
     object-fit: cover;
@@ -52,8 +58,59 @@
     gap: 5px;
 }
 
+.light-theme a, .light-theme span {
+    font-size: 1.2em;
+    padding: 4px 12px;
+}
+
+.pagination-container .light-theme ul li .current {
+    border: none;
+    background: #666;
+    box-shadow: unset;
+}
+
+.pagination-container .light-theme ul li.disabled span {
+    background-color: unset;
+}
+
+.pagination-container .light-theme:not(.current) a:hover,
+.pagination-container .light-theme:not(.current) span:hover {
+    /* background: -webkit-linear-gradient(top,#fff 0,#efefef 100%); */
+    background: #0072ffe0;
+}
+
+.pagination-container .light-theme:not(.current) a, 
+.pagination-container .light-theme:not(.current) span {
+    /* background: -webkit-linear-gradient(top,#fff 0,#efefef 100%); */
+    background: #0072ffe0;
+    border: none;
+    color: #fff;
+}
+
+.pagination-container .light-theme .active .current:hover {
+    background: #666;
+}
+
+.posts-container .disable-anchor-css {
+    text-decoration: none; 
+    color: inherit;
+}
+
+.card-title-text {
+    font-weight: bold;
+    margin-bottom: .4em;
+    font-size: .95em;
+}
+
+.card-plain-text {
+    font-size: .9em;
+}
+
 @media only screen and (max-width: 767px) {
 
+    .card-title-text, .card-plain-text {
+        font-size: .8em;
+    }
 }
 
 @media only screen and (min-width: 768px) and (max-width: 961px) {

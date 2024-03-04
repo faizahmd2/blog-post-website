@@ -1,11 +1,11 @@
 <%- include('partials/_header') -%>
 <link rel="stylesheet" href="css/login.css">
 
-<body style="overflow-x: hidden;">
+<body class="background-image" style="overflow: hidden;">
   <%- include('partials/_navigation', { user }) -%>
   <div class="background">
-    <div class="background-image"></div>
-    <div class="login full-screen-container large-screen-container">
+    <!-- <div class="background-image"></div> -->
+    <div class="login full-screen-container">
       <div class="input-container">
         <h1 class="login-title">SIGN <%= isSignup ? 'UP' : 'IN' %></h1>
         <div class="form" action="<%= isSignup ? 'signup' : 'login' %>">

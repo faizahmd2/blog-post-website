@@ -1,7 +1,7 @@
 
 exports.renderTemplate = function(res, name, options={}) {
     let path = 'templates/'+name;
-    res.render(path,options);
+    res.render(path, options);
 }
 
 exports.pageRender = function(req, res, page) {

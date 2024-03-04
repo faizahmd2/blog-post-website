@@ -1,48 +1,40 @@
 const Post = require('../models/Post');
 const fs = require('fs');
-const path = require('path');
-const { pageRender } = require('../../helper/util');
+const { pageRender, sendResponse, errorTemplate } = require('../../helper/util');
 
 exports.homePage = async (req, res) => {
   pageRender(req, res, 'index');
 }
 
 exports.getAllPosts = async (req, res) => {
-  const page = req.query.page || 1;
-  const postsPerPage = 100;
+  if(req.query.page && isNaN(req.query.page)) req.query.page = null;
+  const { posts, totalCount, totalPage, postsPerPage, currentPage } = await helper.getAllPosts(req);
+  console.log({totalCount, totalPage, postsPerPage, currentPage});
+  let jsonReq = req.headers['x-content-request'] == 'json';
 
-  const totalPosts = await Post.find().countDocuments();
-
-  let conditions;
-  if(req.user) {
-    conditions = [
-      { user_id: req.user.user_id },
-      { publicPost: true, user_id: { $ne: req.user.user_id } }
-    ];
-  } else {
-    conditions = [
-      { publicPost: true }
-    ];
+  if(!(totalCount >= 0)) {
+    if(jsonReq) {
+      return sendResponse(res, 500);
+    }
+    return errorTemplate(res, {title: "500", sub_title: "Internal Server Error", message: "Something bad happened at our end kindly visit home page or try again"});
   }
 
-  const posts = await Post.find({
-    $or: conditions
-  })
-    .sort('-created')
-    .skip((page - 1) * postsPerPage)
-    .limit(postsPerPage);
+  let responseData = {
+    posts: posts,
+    totalPage: totalPage,
+    totalPosts: totalCount,
+    postsPerPage,
+    currentPage
+  }
 
-    let finalPosts = [];
-    for(let i=0; i<=50; i++) {
-      finalPosts = finalPosts.concat(posts);
-    }
+  
+  if(jsonReq) {
+    return res.json({...responseData, success: true});
+  }
   
   req.options = {
-    posts: finalPosts,
-    current: page,
-    pages: Math.ceil(totalPosts / postsPerPage),
-    totalPosts,
-    user: req.user
+    user: req.user,
+    ...responseData
   };
   pageRender(req, res, 'posts');
 };
@@ -55,26 +47,18 @@ exports.getPostByID = async (req, res) => {
 };
 
 exports.createPost = async (req, res) => {
-  const uploadDir = 'public/uploads';
+  let { title, content, plainTextContent, publicPost } = req.body;
+  if (!title || !plainTextContent || plainTextContent.length <= 1 || typeof publicPost != "boolean") return sendResponse(res, 400, "Invalid Parameter Request");
 
-  if(!fs.existsSync(uploadDir)) {
-    fs.mkdirSync(uploadDir);
-  }
-
-  // let uploadedImage = req.files.image;
-  // let uploadPath = path.resolve(__dirname,"../../public/uploads/",uploadedImage.name);
-
-  // uploadedImage.mv(uploadPath, async () => {
-    await Post.create({
-      title: req.body.title || "NA",
-      detail: req.body.detail || "",
-      shortDescription: req.body.shortDescription || "",
-      // image: 'uploads/' + uploadedImage.name,
-      publicPost: !!req.body.publicPost,
-      created: Date.now()
-    })
-  // });
-  pageRender(req, res, 'index');
+  await Post.create({
+    title: title,
+    content: content || "",
+    plainTextContent: plainTextContent,
+    publicPost: publicPost,
+    status: 1,
+    created: Date.now()
+  })
+  res.json({success: true});
 };
 
 exports.deletePost = async (req, res) => {
@@ -84,3 +68,61 @@ exports.deletePost = async (req, res) => {
   await Post.findOneAndRemove({ _id: post._id});
   res.redirect('/');
 };
+
+var helper = {
+  getAllPosts: async function(req) {
+    try {
+      const page = req.query.page || 1;
+      const search = req.query.search || null;
+      const postsPerPage = 30;
+
+      let conditions = [];
+      if(req.user) {
+        conditions.push({
+          $or: [
+            { user_id: req.user.user_id },
+            { publicPost: true, user_id: { $ne: req.user.user_id } }
+          ]
+        });
+      } else {
+        conditions.push({ publicPost: true });
+      }
+
+      if(search) {
+        conditions.push({
+          $or: [
+            { title: { $regex: search, $options: 'i' } },
+            { plainTextContent: { $regex: search, $options: 'i' } }
+          ]
+        })
+      }
+
+      const pipeline = [
+        { $match: { $and: conditions } },
+        { $facet: {
+            totalCount: [{ $count: "totalCount" }],
+            data: [
+              { $skip: (page - 1) * postsPerPage },
+              { $limit: postsPerPage }
+            ]
+          }
+        }
+      ];
+
+      console.log("pipeline---- ",JSON.stringify(pipeline));
+
+      const result = await Post.aggregate(pipeline);
+      const [ data = {} ] = result;
+      const totalCount = data.totalCount && data.totalCount[0] && data.totalCount[0].totalCount || 0;
+      const posts = data.data || [];
+      const totalPage = Math.ceil(totalCount / postsPerPage);
+      console.log("totalCount",totalCount);
+      console.log("posts",posts.length);
+
+      return { posts, totalCount, totalPage, postsPerPage, currentPage: page };
+    } catch (error) {
+      console.log("CATCHE ERR GET posts",error);
+      return { totalCount: -1 };
+    }
+  }
+}

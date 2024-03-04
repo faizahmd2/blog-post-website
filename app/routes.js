@@ -15,7 +15,7 @@ module.exports = function (app) {
   app.get('/', postController.homePage);
   app.get('/posts/:id', postController.getPostByID);
   app.get('/posts', postController.getAllPosts);
-  app.post('/posts', auth.requireLogin, postController.createPost);
+  app.post('/add-post', auth.requireLogin, postController.createPost);
   app.delete('/posts/:id', auth.requireLogin, postController.deletePost);
 
   app.get('/add_post', pageController.getAddPage);

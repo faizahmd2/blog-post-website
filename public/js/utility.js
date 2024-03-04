@@ -15,19 +15,36 @@ function parseSearchQuery() {
     return params;
 }
 
+function setSearchQueryParam(key, value, reload = false) {
+  const searchParams = new URLSearchParams(window.location.search);
+  searchParams.set(key, value);
+
+  const newUrl = `${window.location.origin}${window.location.pathname}?${searchParams.toString()}`;
+
+  if (reload) {
+    window.location.href = newUrl;
+  } else {
+    history.pushState({}, null, newUrl);
+  }
+}
+
 function logout() {
   document.cookie = 'token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
   window.location.href = '/logout';
 }
 
-function fetchData(endpoint, method = "GET", body) {
+function fetchData(endpoint, method = "GET", body=null, options={}) {
   return new Promise((resolve, reject) => {
     const fetchOptions = {
       method: method,
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'X-Content-Request': 'json'
       }
     };
+
+    if(options.header) fetchOptions.headers = {...fetchOptions.headers, ...options.header};
+    if(options.render) delete fetchOptions.headers['X-Content-Request'];
 
     // let token = localStorage.getItem("token");
     // if(token) fetchOptions.headers["Authorization"] = `Bearer ${token}`;
@@ -155,4 +172,14 @@ function deviceInfo() {
 // Function to detect device orientation (portrait or landscape)
 function getOrientation() {
   return window.innerWidth > window.innerHeight ? 'landscape' : 'portrait';
+}
+
+function showLoader() {
+  let progress = document.getElementById("custom-progress-bar");
+  if(progress) progress.style.display = "block";
+}
+
+function hideLoader() {
+  let progress = document.getElementById("custom-progress-bar");
+  if(progress) progress.style.display = "none";
 }

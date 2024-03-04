@@ -1,4 +1,7 @@
 <%- include('partials/_header') -%>
+
+<!-- Simple Pagination css -->
+<!-- <link rel="stylesheet" href="vendor/jquery/css/simplePagination.min.css"> -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/simplePagination.js/1.6/simplePagination.min.css" integrity="sha512-m3x+GduGUoEMGB6dywpah/mAG3GafMmxmByGLqKfZFF8xr6THjjOcH0OWV1rLBFiZMotecZxWhRz0lVlVNl72w==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 <link rel="stylesheet" href="css/posts.css">
 
@@ -11,16 +14,15 @@
       <button class="btn btn-outline-secondary" type="button" id="button-addon2">Search</button>
     </div>
     <div class="posts-container">
-      <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-1">
+      <div id="all-posts" class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-1">
         <% posts.forEach(post => { %>
           <div class="col">
+            <a href="#" class="disable-anchor-css">
               <div class="card mb-2">
-                  <!-- <img src="<%= post.image %>" class="card-img-top" alt="..."> -->
-                  <h5 class="card-title"><%= post.title %></h5>
-                  <p class="card-text"><%= post.detail.slice(0, 172) + (post.detail.length > 172 ? "..." : "") %></p>
-                  <!-- <div class="card-body">
-                  </div> -->
+                  <h5 class="card-title-text"><%= post.title %></h5>
+                  <p class="card-plain-text"><%= post.plainTextContent.slice(0, 172) + (post.plainTextContent.length > 172 ? "..." : "") %></p>
               </div>
+            </a>
           </div>
         <% }); %>
       </div>
@@ -30,17 +32,68 @@
     <div id="pagination"></div>
   </div>
 
+  <!-- Simple Pagination js -->
+  <!-- <script src="/public/vendor/jquery/js/jquery.min.js"></script> -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/simplePagination.js/1.6/jquery.simplePagination.min.js" integrity="sha512-9Dh726RTZVE1k5R1RNEzk1ex4AoRjxNMFKtZdcWaG2KUgjEmFYN3n17YLUrbHm47CRQB1mvVBHDFXrcnx/deDA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="js/utility.js"></script>
   <script>
+    let totalPosts = '<%= totalPosts %>';
+    let postsPerPage = '<%= postsPerPage %>';
+    let totalPage = '<%= totalPage %>';
+    let currentPage = '<%= currentPage %>';
+
     $(document).ready(function(){
-    // Initialize pagination
-    const cards = [{image:'', title:"titleee",description:"description"}];
-    $('#pagination').pagination({
-      items: 100,
-      itemsOnPage: 5,
-      cssStyle: 'light-theme'
+      // Initialize pagination
+      initPagination(totalPosts, totalPage, postsPerPage, currentPage);
     });
-  });
+
+    async function getPostsByApi() {
+      let url = "/posts" + window.location.search;
+
+      let response = await fetchData(url);
+
+      if(response.error) return notify.error(response.error);
+
+      if(!response.success) return notify.error("Some error occured");
+
+      return response;
+    }
+
+    function initPagination(items, pages, itemsOnPage, currentPage=1) {
+      $('#pagination').pagination({
+        items: items,
+        itemsOnPage: itemsOnPage,
+        currentPage: currentPage,
+        displayedPages: 3,
+        cssStyle: 'light-theme',
+        onPageClick: function(pageNumber, event) {
+          event.preventDefault();
+          showLoader();
+          setSearchQueryParam("page", pageNumber, false);
+          getPostsByApi().then(response => {
+            const parentDiv = document.getElementById('all-posts');
+            parentDiv.innerHTML = '';
+            for(let post of response.posts) {
+              let template = getPostCardHtml(post);
+              $('#all-posts').append(template);
+            }
+            hideLoader();
+          })
+        }
+      });
+    }
+
+    function getPostCardHtml(post) {
+      return `<div class="col">
+        <a href="#" class="disable-anchor-css">
+          <div class="card mb-2">
+              <h5 class="card-title-text">${post.title}</h5>
+              <p class="card-plain-text">${post.plainTextContent.slice(0, 172) + (post.plainTextContent.length > 172 ? "..." : "")}</p>
+          </div>
+        </a>
+      </div>`
+    }
+
   </script>
 </body>
 

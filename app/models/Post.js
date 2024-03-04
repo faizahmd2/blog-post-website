@@ -7,14 +7,16 @@ const PostSchema = new Schema({
     ref: 'logins'
   },
   title: String,
-  detail: String,
-  image: String,
-  shortDescription: String,
+  content: String,
+  plainTextContent: String,
   publicPost: {
     type: Boolean,
     default: false
   },
-  imageType: String,
+  status: {
+    type: Number,
+    default: 1
+  },
   created: Date,
   modified: {
     type: Date,

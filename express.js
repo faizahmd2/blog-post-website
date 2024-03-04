@@ -7,7 +7,7 @@ const { errorTemplate } = require('./helper/util');
 const rateLimit = require("express-rate-limit");
 const fileUpload = require('express-fileupload');
 const methodOverride = require('method-override');
-const { userTokenInfo } = require('./config/middlewares/auth')
+const { userTokenInfo } = require('./config/middlewares/auth');
 
 module.exports = function(app, passport) {
     console.log('Initializing Express');
