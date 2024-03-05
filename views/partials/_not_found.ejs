@@ -1,0 +1,60 @@
+<style>
+    .no-datas-container {
+        height: 90vh;
+        width: 100vw;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin: 0;
+        padding: 0;
+    }
+
+    .no-datas-container .no-datas-content {
+        background: #333;
+        width: 70%;
+        height: 64%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        font-size: 1rem;
+        border-radius: 5px;
+    }
+
+    .no-datas-container .no-datas-content p,
+    .no-datas-container .no-datas-content h2 {
+        color: #fff;
+    }
+
+    .no-datas-container .no-datas-content button {
+        padding: 10px 20px;
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+    .no-datas-container .no-datas-content button:hover {
+        background-color: #0056b3;
+    }
+
+</style>
+
+<div class="no-datas-container">
+    <div class="no-datas-content">
+        <h2><%= data.title ? data.title : "No Data Found" %></h2>
+        
+        <% if (data.sub_title) { %>
+            <p><%= data.sub_title %></p>
+        <% } %>
+
+        <% if (data.link) { %>
+            <a href="<%= data.link %>">
+                <button><%= data.link_text ? data.link_text : "Redirect" %></button>
+            </a>
+        <% } %>
+    </div>
+</div>
+  

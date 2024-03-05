@@ -6,34 +6,40 @@
 <link rel="stylesheet" href="css/posts.css">
 
 <body class="background-image" style="overflow: hidden;">
-<%- include('partials/_navigation', { user }) -%>
-
-  <div class="posts">
-    <div class="input-group mb-3   searchbar">
-      <div class="input-search-parent">
-        <input id="search" type="text" class="form-control" placeholder="Search..." aria-label="Search" aria-describedby="button-addon2">
-        <span id="clearSearch" class="clear-search">&times;</span>
-      </div>
-      <!-- <button class="btn btn-primary" type="button" id="button-addon2">Search</button> -->
-    </div>
-    <div class="posts-container">
-      <div id="all-posts" class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-1">
-        <% posts.forEach(post => { %>
-          <div class="col">
-            <a href="#" class="disable-anchor-css">
-              <div class="card mb-3">
-                  <h5 class="card-title-text"><%= post.title %></h5>
-                  <p class="mb-1 card-plain-text"><%= post.plainTextContent.slice(0, 172) + (post.plainTextContent.length > 172 ? "..." : "") %></p>
-              </div>
-            </a>
+  <%- include('partials/_navigation', { user }) -%>
+    <% if (posts.length) { %>
+      <div class="posts">
+        <div class="input-group mb-3   searchbar">
+          <div class="input-search-parent">
+            <input id="search" type="text" class="form-control" placeholder="Search..." aria-label="Search" aria-describedby="button-addon2">
+            <span id="clearSearch" class="clear-search">&times;</span>
           </div>
-        <% }); %>
+          <!-- <button class="btn btn-primary" type="button" id="button-addon2">Search</button> -->
+        </div>
+        <div class="posts-container">
+          <div id="all-posts" class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-1">
+            <% posts.forEach(post => { %>
+              <div class="col">
+                <a href="#" class="disable-anchor-css">
+                  <div class="card mb-3">
+                      <h5 class="card-title-text"><%= post.title %></h5>
+                      <p class="mb-1 card-plain-text"><%= post.plainTextContent.slice(0, 172) + (post.plainTextContent.length > 172 ? "..." : "") %></p>
+                  </div>
+                </a>
+              </div>
+            <% }); %>
+          </div>
+          
+        </div>
       </div>
-    </div>
-  </div>
-  <div class="pagination-container">
-    <div id="pagination"></div>
-  </div>
+      <div class="pagination-container">
+        <div id="pagination"></div>
+      </div>
+      <% } else if (user) { %>
+        <%- include('partials/_not_found', { data: { title: "No Posts Found", sub_title: "It seems there are no posts available.", link: "/add-post", link_text: "Add New Post" } }) -%>
+      <% } else { %>
+        <%- include('partials/_not_found', { data: {title: "No Posts Found", sub_title: "Get Login to add your own posts.", link: "/login", link_text: "Go To Login"} }) -%>
+      <% } %>
 
   <!-- Simple Pagination js -->
   <!-- <script src="/public/vendor/jquery/js/jquery.min.js"></script> -->
