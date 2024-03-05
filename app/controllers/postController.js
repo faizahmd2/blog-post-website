@@ -9,7 +9,6 @@ exports.homePage = async (req, res) => {
 exports.getAllPosts = async (req, res) => {
   if(req.query.page && isNaN(req.query.page)) req.query.page = null;
   const { posts, totalCount, totalPage, postsPerPage, currentPage } = await helper.getAllPosts(req);
-  console.log({totalCount, totalPage, postsPerPage, currentPage});
   let jsonReq = req.headers['x-content-request'] == 'json';
 
   if(!(totalCount >= 0)) {
@@ -74,7 +73,7 @@ var helper = {
     try {
       const page = req.query.page || 1;
       const search = req.query.search || null;
-      const postsPerPage = 30;
+      const postsPerPage = 50;
 
       let conditions = [];
       if(req.user) {
@@ -109,15 +108,15 @@ var helper = {
         }
       ];
 
-      console.log("pipeline---- ",JSON.stringify(pipeline));
+      // console.log("pipeline---- ",JSON.stringify(pipeline));
 
       const result = await Post.aggregate(pipeline);
       const [ data = {} ] = result;
       const totalCount = data.totalCount && data.totalCount[0] && data.totalCount[0].totalCount || 0;
       const posts = data.data || [];
       const totalPage = Math.ceil(totalCount / postsPerPage);
-      console.log("totalCount",totalCount);
-      console.log("posts",posts.length);
+      // console.log("totalCount",totalCount);
+      // console.log("posts",posts.length);
 
       return { posts, totalCount, totalPage, postsPerPage, currentPage: page };
     } catch (error) {

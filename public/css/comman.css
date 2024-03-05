@@ -1,7 +1,7 @@
 body {
-  font-size: 20px;
+  font-size: 1.2em;
   color: #212529;
-  font-family: 'Lora', 'Times New Roman', serif;
+  font-family: "Roboto", sans-serif;
 }
 
 a {
@@ -134,18 +134,17 @@ img::-moz-selection {
   letter-spacing: 1px;
   text-transform: uppercase;
   border-radius: 6px;
-  font-family: 'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  border: none;
+  font-family: 'Roboto', 'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
 }
 
 .btn-primary {
-  background-color: #0085A1;
-  border-color: #0085A1;
+  background-color: #0072ffe0;
 }
 
 .btn-primary:hover, .btn-primary:focus, .btn-primary:active {
   color: #fff;
-  background-color: #00657b !important;
-  border-color: #00657b !important;
+  background-color: #00657b;
 }
 
 .btn-lg {

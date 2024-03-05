@@ -52,13 +52,14 @@
 }
 
 .posts .search {
-    display: flex;
-    justify-content: center;
+    display: grid;
+    grid-template-columns: 5fr 1fr;
+    gap: 8px;
     align-items: center;
-    gap: 5px;
 }
 
-.light-theme a, .light-theme span {
+.pagination-container .light-theme a, 
+.pagination-container .light-theme span {
     font-size: 1.2em;
     padding: 4px 12px;
 }
@@ -106,10 +107,57 @@
     font-size: .9em;
 }
 
+.input-search-parent {
+    position: relative;
+}
+
+.input-search-parent span {
+    position: absolute;
+    right: 5%;
+    top: 0;
+    font-size: 1.4em;
+    cursor: pointer;
+}
+
+.input-search-parent input:placeholder-shown + .clear-search {
+    display: none;
+}
+
+.input-search-parent input:not(:placeholder-shown) + .clear-search {
+    display: block;
+}
+
 @media only screen and (max-width: 767px) {
 
-    .card-title-text, .card-plain-text {
+    ::-webkit-scrollbar {
+        width: 0.2em;
+    }
+
+    .pagination-container {
+        margin: 0.5em .5vw 0px;
+    }
+
+    .card-title-text {
         font-size: .8em;
+    }
+
+    .card-plain-text {
+        font-size: .75em;
+    }
+    
+    .pagination-container .light-theme a, 
+    .pagination-container .light-theme span {
+        font-size: .8em;
+        padding: 2px 9px;
+    }
+
+    .pagination-container .light-theme .prev, 
+    .pagination-container .light-theme .next {
+        padding: 2px 8px;
+    }
+
+    .posts-container .card {
+        height: 4.8em;
     }
 }
 

@@ -15,16 +15,28 @@ function parseSearchQuery() {
     return params;
 }
 
-function setSearchQueryParam(key, value, reload = false) {
+function setSearchQueryParam(params, reload = false) {
   const searchParams = new URLSearchParams(window.location.search);
-  searchParams.set(key, value);
+  
+  for (const [key, value] of Object.entries(params)) {
+      if (value !== "") {
+          searchParams.set(key, value);
+      } else {
+          searchParams.delete(key);
+      }
+  }
 
-  const newUrl = `${window.location.origin}${window.location.pathname}?${searchParams.toString()}`;
+  let newUrl = `${window.location.origin}${window.location.pathname}`;
+
+  // Append only if there are query parameters
+  if (searchParams.toString()) {
+      newUrl += `?${searchParams.toString()}`;
+  }
 
   if (reload) {
-    window.location.href = newUrl;
+      window.location.href = newUrl;
   } else {
-    history.pushState({}, null, newUrl);
+      history.pushState({}, null, newUrl);
   }
 }
 
@@ -182,4 +194,14 @@ function showLoader() {
 function hideLoader() {
   let progress = document.getElementById("custom-progress-bar");
   if(progress) progress.style.display = "none";
+}
+
+function debounce(fn, delay) {
+  let timer;
+  return function(...args) {
+    clearTimeout(timer);
+    timer = setTimeout(() => {
+      fn.apply(this, args);
+    }, delay);
+  };
 }

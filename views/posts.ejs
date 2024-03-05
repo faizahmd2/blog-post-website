@@ -10,8 +10,11 @@
 
   <div class="posts">
     <div class="input-group mb-3 search">
-      <input type="text" class="form-control" placeholder="Search..." aria-label="Search" aria-describedby="button-addon2">
-      <button class="btn btn-outline-secondary" type="button" id="button-addon2">Search</button>
+      <div class="input-search-parent">
+        <input id="search" type="text" class="form-control" placeholder="Search..." aria-label="Search" aria-describedby="button-addon2">
+        <span id="clearSearch" class="clear-search">&times;</span>
+      </div>
+      <button class="btn btn-primary" type="button" id="button-addon2">Search</button>
     </div>
     <div class="posts-container">
       <div id="all-posts" class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-1">
@@ -20,7 +23,7 @@
             <a href="#" class="disable-anchor-css">
               <div class="card mb-2">
                   <h5 class="card-title-text"><%= post.title %></h5>
-                  <p class="card-plain-text"><%= post.plainTextContent.slice(0, 172) + (post.plainTextContent.length > 172 ? "..." : "") %></p>
+                  <p class="mb-1 card-plain-text"><%= post.plainTextContent.slice(0, 172) + (post.plainTextContent.length > 172 ? "..." : "") %></p>
               </div>
             </a>
           </div>
@@ -41,11 +44,32 @@
     let postsPerPage = '<%= postsPerPage %>';
     let totalPage = '<%= totalPage %>';
     let currentPage = '<%= currentPage %>';
+    const debouncedListChange = debounce(handleListChange, 600);
 
     $(document).ready(function(){
       // Initialize pagination
-      initPagination(totalPosts, totalPage, postsPerPage, currentPage);
+      if(totalPage > 1) {
+        initPagination(totalPosts, totalPage, postsPerPage, currentPage);
+      }
+
+      $("#search").on("input", function() {
+        debouncedListChange(this.value,"");
+      });
+
+      $("#clearSearch").on("click", function() {
+        handleListChange("", "");
+        $("#search").val("");
+      })
     });
+
+    function handleListChange(search, page) {
+      showLoader();
+      setSearchQueryParam({"search": search, "page": page});
+      getPostsByApi().then(response => {
+        appendPostsCard(response);
+          hideLoader();
+      });
+    }
 
     async function getPostsByApi() {
       let url = "/posts" + window.location.search;
@@ -68,19 +92,18 @@
         cssStyle: 'light-theme',
         onPageClick: function(pageNumber, event) {
           event.preventDefault();
-          showLoader();
-          setSearchQueryParam("page", pageNumber, false);
-          getPostsByApi().then(response => {
-            const parentDiv = document.getElementById('all-posts');
-            parentDiv.innerHTML = '';
-            for(let post of response.posts) {
-              let template = getPostCardHtml(post);
-              $('#all-posts').append(template);
-            }
-            hideLoader();
-          })
+          debouncedListChange($("#search").val(), pageNumber);
         }
       });
+    }
+
+    function appendPostsCard(response) {
+      const parentDiv = document.getElementById('all-posts');
+      parentDiv.innerHTML = '';
+      for(let post of response.posts) {
+        let template = getPostCardHtml(post);
+        $('#all-posts').append(template);
+      }
     }
 
     function getPostCardHtml(post) {
