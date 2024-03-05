@@ -13,15 +13,15 @@ module.exports = {
   },
   registerUser: async (req, res) => {
     try {
-        let { name, email, password, password2, phone, address, pincode, age, message } = req.body;
+        let { username, name, password, password2, email, phone, address, pincode, age, message } = req.body;
         if (
-          !email || 
-          !password || 
+          !username || 
+          !/^[a-zA-Z_][a-zA-Z0-9_]*$/.test(username) ||
+          username.length > 30 ||
+          !password ||
           !name ||
-          !/^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$/.test(email) ||
           password != password2 ||
           name.length > 40 ||
-          email.length > 40 ||
           password.length < 5 ||
           password.length > 50
           ) {
@@ -29,7 +29,7 @@ module.exports = {
         }
     
         //Check if user exists
-        const resp = await helper.verifyUser({email, status: 1});
+        const resp = await helper.verifyUser({username, status: 1});
     
         if (resp && resp == 'Unknown User') {
           //Hash password
@@ -39,12 +39,13 @@ module.exports = {
           let loginObj = {
             name,
             initial: helper.generateInitials(name),
-            email:email,
+            username:username,
             password: hashedPassword,
             status: 1,
             created: new Date()
           };
           
+          if(email) loginObj.email = email;
           if(phone) loginObj.phone = phone;
           if(address) loginObj.address = address;
           if(pincode) loginObj.pincode = +pincode;
@@ -56,7 +57,7 @@ module.exports = {
             return res.sendStatus(201);
           }
         } else if(resp.user) {
-          return sendResponse(res, 400, 'Email Already Registerd');
+          return sendResponse(res, 400, 'User Already Registerd');
         }
 
         sendResponse(res, 400, 'Could Not Create User');
@@ -67,8 +68,8 @@ module.exports = {
   },
   loginUser: async (req, res) => {
     try {
-        let {email, password} = req.body;
-        if(!email || !password) return sendResponse(res, 400, 'Email or Password Missing');
+        let {username, password} = req.body;
+        if(!username || !password) return sendResponse(res, 400, 'Username or Password Missing');
         passport.authenticate('local', (err, user) => {
           if (user) {
             const token = sign({user_id: user._id, initial: user.initial});
@@ -78,7 +79,7 @@ module.exports = {
             });
           }
           sendResponse(res, 400, 'Invalid Username Or Password');
-        })({ body: { email, password } });
+        })({ body: { username, password } });
     } catch (error) {
         console.error(error);
         sendResponse(res, 500);
@@ -89,6 +90,25 @@ module.exports = {
 
     req.options = { isSignup };
     pageRender(req, res, "login");
+  },
+  createUsernameValidation: async function(req, res) {
+    try {
+      let username = req.body.key;
+      if(!username) return sendResponse(res, 400, "Username Required");
+      if(username.length < 4) return sendResponse(res, 400, "Atleast 4 character required");
+      if(username.length > 30) return sendResponse(res, 400, "Username too long");
+      if(!/^[a-zA-Z_][a-zA-Z0-9_]*$/.test(username)) return sendResponse(res, 400, "Only alphabets, number and underscore allowed");
+
+      const resp = await helper.verifyUser({username, status: 1});
+      if (resp && resp == 'Unknown User') {
+        res.json({success: true});
+      } else {
+        return sendResponse(res, 400, "Already Exist!");
+      }
+    } catch (error) {
+      console.log("ERROR: ",error);
+      return { success: true };
+    }
   }
 };
 

@@ -4,8 +4,8 @@ const bcrypt = require("bcryptjs");
 const LocalStrategy = require('passport-local').Strategy;
 const Login = require('../app/models/Login');
 
-passport.use(new LocalStrategy({usernameField: 'email', passwordField: 'password'},async function(email, password, done) {
-    let user = await Login.findOne({email: email, status: 1});
+passport.use(new LocalStrategy({usernameField: 'username', passwordField: 'password'},async function(username, password, done) {
+    let user = await Login.findOne({username: username, status: 1});
     if (!user) return done(null, false, { message: 'Unknown User' });
 
     // User found check password

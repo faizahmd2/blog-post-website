@@ -9,19 +9,19 @@
 <%- include('partials/_navigation', { user }) -%>
 
   <div class="posts">
-    <div class="input-group mb-3 search">
+    <div class="input-group mb-3   searchbar">
       <div class="input-search-parent">
         <input id="search" type="text" class="form-control" placeholder="Search..." aria-label="Search" aria-describedby="button-addon2">
         <span id="clearSearch" class="clear-search">&times;</span>
       </div>
-      <button class="btn btn-primary" type="button" id="button-addon2">Search</button>
+      <!-- <button class="btn btn-primary" type="button" id="button-addon2">Search</button> -->
     </div>
     <div class="posts-container">
       <div id="all-posts" class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-1">
         <% posts.forEach(post => { %>
           <div class="col">
             <a href="#" class="disable-anchor-css">
-              <div class="card mb-2">
+              <div class="card mb-3">
                   <h5 class="card-title-text"><%= post.title %></h5>
                   <p class="mb-1 card-plain-text"><%= post.plainTextContent.slice(0, 172) + (post.plainTextContent.length > 172 ? "..." : "") %></p>
               </div>

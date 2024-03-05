@@ -9,6 +9,7 @@ module.exports = function (app) {
   app.get('/login', login.renderLogin);
   app.post('/login', login.loginUser);
   app.post('/signup', login.registerUser);
+  app.post('/validate-username', login.createUsernameValidation);
   app.get('/logout', login.logout);
   
   //ROUTES

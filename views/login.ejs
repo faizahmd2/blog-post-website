@@ -3,8 +3,6 @@
 
 <body class="background-image" style="overflow: hidden;">
   <%- include('partials/_navigation', { user }) -%>
-  <div class="background">
-    <!-- <div class="background-image"></div> -->
     <div class="login full-screen-container">
       <div class="input-container">
         <h1 class="login-title">SIGN <%= isSignup ? 'UP' : 'IN' %></h1>
@@ -12,32 +10,40 @@
           <div class="feild-container">
             <% if(isSignup){ %>
               <div class="input-group name-parent">
-                <label for="name">Full Name<span class="red">*</span></label>
-                <input type="text" name="name" class="input-name" placeholder="Full Name">
+                <label for="name">Name<span class="red">*</span></label>
+                <input type="text" name="name" class="input-name" placeholder="Name">
               </div>
            <% } %>
 
-            <div class="input-group email-parent">
-              <label for="email">Email<span class="red">*</span></label>
-              <input type="email" name="email" class="input-email" placeholder="Email">
-              <!-- <span err-message="email" class="msg red">*Invalid Email</span> -->
+            <div class="input-group username-parent">
+              <label for="username">Username<span class="red">*</span></label>
+              <input type="text" name="username" class="input-username" placeholder="Username">
             </div>
 
             <div class="input-group password-parent">
               <label for="password">Password<span class="red">*</span></label>
-              <input type="password" name="password" class="input-password" placeholder="Password">
-              <img class="icon-password" src="/img/icons/invisible.png" alt="" onclick="togglePasswordVisibility('password')">
+              <div class="pass-box">
+                <input type="password" name="password" class="input-password" placeholder="Password">
+                <img class="icon-password" src="/img/icons/invisible.png" alt="" onclick="togglePasswordVisibility('password')">
+              </div>
             </div>
 
             <% if(isSignup){ %>
             <div class="input-group password2-parent">
               <label for="password2">Verify Password<span class="red">*</span></label>
-              <input type="password" name="password2" class="input-password2"
-                placeholder="Verify Password">
-              <img class="icon-password2" src="/img/icons/invisible.png" alt="" onclick="togglePasswordVisibility('password2')">
+              <div class="pass-box">
+                <input type="password" name="password2" class="input-password2"
+                  placeholder="Verify Password">
+                <img class="icon-password2" src="/img/icons/invisible.png" alt="" onclick="togglePasswordVisibility('password2')">
+              </div>
             </div>
 
             <div class="additional-fields">
+              <div class="input-group">
+                <label for="email">Email</label>
+                <input type="email" name="email" placeholder="Email">
+              </div>
+
               <div class="input-group">
                 <label for="phone">Phone</label>
                 <input type="number" name="phone" placeholder="Phone">
@@ -56,11 +62,6 @@
               <div class="input-group">
                 <label for="pincode">Pincode</label>
                 <input type="number" name="pincode" placeholder="Pincode">
-              </div>
-
-              <div class="input-group">
-                <label for="message">Message</label>
-                <textarea name="message" cols="5" rows="4" placeholder="Message"></textarea>
               </div>
             </div>
             <div class="additional">
@@ -84,7 +85,6 @@
         </form>
       </div>
     </div>
-  </div>
   
   <!-- Main JS -->
   <script src="js/utility.js"></script>
@@ -95,9 +95,9 @@
 
     async function init() {
       if(isSignup()) {
-        validationInput = ["name", "email", "password", "password2"];
+        validationInput = ["name", "username", "password", "password2"];
       } else {
-        validationInput = ["email", "password"];
+        validationInput = ["username", "password"];
       }
       resetFormData();
     }
@@ -219,7 +219,6 @@
         $(`span[err-message='${_type}']`).hide();
         $(`.input-${_type}`).removeClass("error");
         $(`.input-${_type}`).removeClass("success");
-        if(_type.includes("password")) setPasswordIcon(_type, '60%');
       }
     }
 
@@ -235,20 +234,12 @@
         const parentDiv = $(parentClass);
         parentDiv.append(elem);
       }
-
-      if(type.includes("password")) setPasswordIcon(type, '47%');
-    }
-
-    function setPasswordIcon(name,value) {
-      $(`.icon-${name}`).css("top", value);
     }
 
     function hideError(type) {
       const messageElement = $(`span[err-message='${type}']`);
       if (messageElement.length) {
         messageElement.hide();
-        let parentClass = "." + type+"-parent";
-        if(type.includes("password")) setPasswordIcon(type, '60%');
       }
     }
 
@@ -267,18 +258,28 @@
       let error = null;
       let signup = isSignup();
       switch(type) {
-        case "email" :
-          if(signup && !/^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$/.test(value)) {
-            error = "Invalid Email";
+        case "username" :
+          if(signup) {
+            if(!value) error = "Username Required";
+            if(value.length < 4) error = "Atleast 4 character required";
+            if(value.length > 30) error = "Username too long";
+            if(!/^[a-zA-Z_][a-zA-Z0-9_]*$/.test(value)) error = "Only alphabets, number and underscore allowed";
           } else if(!value) {
-            error = "Email Required";
+            error = "Username Can't be empty";
           }
-          if(value.length > 40) error = "Please provide correct email";
           break;
-        case "name" :
-          if(!value) error = "Please enter name";
-          if(value.length > 40) error = "Name is too long";
-          break;
+        // case "email" :
+        //   if(signup && !/^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$/.test(value)) {
+        //     error = "Invalid Email";
+        //   } else if(!value) {
+        //     error = "Email Required";
+        //   }
+        //   if(value.length > 40) error = "Please provide correct email";
+        //   break;
+        // case "name" :
+        //   if(!value) error = "Please enter name";
+        //   if(value.length > 40) error = "Name is too long";
+        //   break;
         case "password" :
           if(!value) error = "Password Can't be empty";
           if(signup) {
@@ -311,7 +312,18 @@
             currentInputElement.removeClass('error');
           }
           if(isSignup() && !currentInputElement.hasClass('success')) {
-            currentInputElement.addClass('success');
+            if(type == "username") {
+              fetchData('/validate-username', 'POST', {key: event.target.value}).then(response => {
+                if(response.success) {
+                  currentInputElement.addClass('success');
+                } else if(response.error) {
+                  currentInputElement.addClass('error');
+                  showError(type, response.error);
+                };
+              });
+            } else {
+              currentInputElement.addClass('success');
+            }
           }
           hideError(type);
         }

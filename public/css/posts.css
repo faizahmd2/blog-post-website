@@ -4,7 +4,7 @@
 
 .posts-container {
     overflow-y: auto;
-    max-height: 67vh;
+    max-height: 80vh;
     overflow-x: hidden;
     padding: 5px;
 }
@@ -49,13 +49,6 @@
 
 .posts .btn {
     padding: 9px 17px;
-}
-
-.posts .search {
-    display: grid;
-    grid-template-columns: 5fr 1fr;
-    gap: 8px;
-    align-items: center;
 }
 
 .pagination-container .light-theme a, 
@@ -109,6 +102,19 @@
 
 .input-search-parent {
     position: relative;
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+}
+
+.input-search-parent input {
+    /* width: 35%; */
+    transition: width 0.3s ease-in-out;
+}
+
+.input-search-parent input:focus {
+    width: 100%;
 }
 
 .input-search-parent span {
@@ -157,7 +163,11 @@
     }
 
     .posts-container .card {
-        height: 4.8em;
+        height: 5.5em;
+    }
+
+    .posts-container {
+        max-height: 75vh;
     }
 }
 
