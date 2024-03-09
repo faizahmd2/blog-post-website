@@ -11,6 +11,7 @@ var exportAuth = {
     userTokenInfo: function(req, res, next) {
         let url = req.url;
         if(url.includes(".")) return next();
+        req.options = {};
         
         const token = req.cookies && req.cookies.token;
         if (!token) {
@@ -18,7 +19,6 @@ var exportAuth = {
             return next();
         }
         
-        req.options = {};
         try {
             let result = verify(token);
 
