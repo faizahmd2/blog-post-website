@@ -6,9 +6,7 @@ exports.renderTemplate = function(res, name, options={}) {
 
 exports.pageRender = function(req, res, page) {
     const options = req.options || {};
-    if(req.user) {
-        options.user = req.user;
-    } else {
+    if(!options.hasOwnProperty("user")) {
         options.user = null;
     }
 

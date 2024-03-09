@@ -4,16 +4,13 @@
 
 .posts-container {
     overflow-y: auto;
-    max-height: 80vh;
+    max-height: 74vh;
     overflow-x: hidden;
     padding: 5px;
 }
 
-.posts-container .card {
-    cursor: pointer;
-    width: 100%;
-    height: 5em;
-    padding: 4px 8px;
+.posts-container #all-posts {
+    margin: 0;
 }
 
 .pagination-container {
@@ -98,6 +95,7 @@
 
 .card-plain-text {
     font-size: .9em;
+    overflow: hidden;
 }
 
 .input-search-parent {
@@ -140,11 +138,11 @@
     }
 
     .pagination-container {
-        margin: 0.5em .5vw 0px;
+        margin: 0.5em 4.5vw 0px;
     }
 
     .card-title-text {
-        font-size: .8em;
+        font-size: .85em;
     }
 
     .card-plain-text {
@@ -162,19 +160,12 @@
         padding: 2px 8px;
     }
 
-    .posts-container .card {
-        height: 5.5em;
-    }
-
     .posts-container {
-        max-height: 75vh;
+        max-height: 65vh;
     }
 }
 
-@media only screen and (min-width: 768px) and (max-width: 961px) {
-
-}
-
-@media only screen and (min-width: 962px) {
+@media only screen and (min-width: 768px) {
+    
 
 }

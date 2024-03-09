@@ -1,0 +1,25 @@
+<% if (card.redirect) { %>
+<a href="<%= card.redirect %>" class="disable-anchor-css">
+<% } %>
+    <div class="custom-card-container">
+        <div class="custom-card">
+            <div class="custom-card__actions">
+                <div class="left-actions">
+                    <div class="custom-card__user-initials"><%= card.initial || 'NA' %></div>
+                </div>
+                <div class="right-actions">
+                    <div class="admin-actions">
+                        <% if (card.admin) { %>
+                            <i class="fas fa-edit custom-card__action"></i>
+                            <i class="fas fa-trash-alt custom-card__action"></i>
+                        <% } %>
+                    </div>
+                </div>
+            </div>
+            <h3 class="custom-card__title"><%= card.title.slice(0, 50) + (card.title.length > 50 ? "..." : "") || 'NA' %></h3>
+            <p class="custom-card__text"><%= card.description || "NA" %></p>
+        </div>
+    </div>
+<% if (card.redirect) { %>
+</a>
+<% } %>

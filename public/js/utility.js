@@ -51,27 +51,27 @@ function fetchData(endpoint, method = "GET", body=null, options={}) {
       method: method,
       headers: {
         'Content-Type': 'application/json',
-        'X-Content-Request': 'json'
+        'X-Api-Request': 'true'
       }
     };
 
     if(options.header) fetchOptions.headers = {...fetchOptions.headers, ...options.header};
-    if(options.render) delete fetchOptions.headers['X-Content-Request'];
-
-    // let token = localStorage.getItem("token");
-    // if(token) fetchOptions.headers["Authorization"] = `Bearer ${token}`;
     
     if(body) fetchOptions.body = JSON.stringify(body);
 
     let status = 404;
     fetch(getCurrentBaseUrl() + endpoint, fetchOptions)
-      .then(response => {
+      .then(async response => {
         status = response.status;
         if (!response.ok) {
           if(status == 401) {
             logout();
             return resolve({});
           }
+        }
+
+        if (status == 226 && response.headers.get('Content-Encoding') === 'gzip') {
+          return response.arrayBuffer();
         }
 
         const contentType = response.headers.get('content-type');
@@ -81,8 +81,12 @@ function fetchData(endpoint, method = "GET", body=null, options={}) {
           return {status};
         }
       })
-      .then(result => {
-        console.log("RESULT", result);
+      .then(async result => {
+        if(status == 226) {
+          const decompressedData = new TextDecoder().decode(new Uint8Array(result));
+          return resolve({decompressedData, status});
+        }
+
         resolve(result);
       })
       .catch(e => {

@@ -91,7 +91,61 @@
   <script>
     let validationInput = [];
 
-    init();
+    document.addEventListener("DOMContentLoaded", function() {
+      
+      $("input").on("keyup", function(event) {
+        let type = event.target.name;
+        if(event.keyCode !== 13 && validationInput.includes(type)) {
+          const currentInputElement = $(`.input-${type}`);
+          let hasErrorClass = currentInputElement.hasClass('error');
+
+          let error = formValid(type, event.target.value);
+          if(error) {
+            if (!hasErrorClass) {
+                currentInputElement.addClass('error');
+            }
+            showError(type, error);
+          } else {
+            if(hasErrorClass) {
+              currentInputElement.removeClass('error');
+            }
+            if(isSignup() && !currentInputElement.hasClass('success')) {
+              if(type == "username") {
+                fetchData('/api/validate-username', 'POST', {key: event.target.value}).then(response => {
+                  if(response.success) {
+                    currentInputElement.addClass('success');
+                  } else if(response.error) {
+                    currentInputElement.addClass('error');
+                    showError(type, response.error);
+                  };
+                });
+              } else {
+                currentInputElement.addClass('success');
+              }
+            }
+            hideError(type);
+          }
+        }
+
+        let submitError = submitFormError();
+        if(event.keyCode === 13) {
+          if(submitError) return showError(type, submitError);
+
+          return submitForm();
+        }
+
+        if(submitError) $("#submit-btn").addClass('disabled');
+        else $("#submit-btn").removeClass('disabled');
+      });
+
+      $("input").on("focusout", function(event) {
+        if(validationInput.includes(event.target.name)) {
+          $(`.input-${event.target.name}`).removeClass('success');
+        }
+      });
+      init();
+    });
+
 
     async function init() {
       if(isSignup()) {
@@ -111,7 +165,7 @@
       let formData = getFormData();
       let isLogin = !isSignup();
 
-      let response = await fetchData(isLogin ? '/login' : '/signup', 'POST', formData);
+      let response = await fetchData(isLogin ? '/api/login' : '/api/signup', 'POST', formData);
 
       if(response.error) return notify.error(response.error);
       
@@ -294,56 +348,5 @@
 
       return error;
     }
-
-    $("input").on("keyup", function(event) {
-      let type = event.target.name;
-      if(event.target.keyCode !== 13 && validationInput.includes(type)) {
-        const currentInputElement = $(`.input-${type}`);
-        let hasErrorClass = currentInputElement.hasClass('error');
-
-        let error = formValid(type, event.target.value);
-        if(error) {
-          if (!hasErrorClass) {
-              currentInputElement.addClass('error');
-          }
-          showError(type, error);
-        } else {
-          if(hasErrorClass) {
-            currentInputElement.removeClass('error');
-          }
-          if(isSignup() && !currentInputElement.hasClass('success')) {
-            if(type == "username") {
-              fetchData('/validate-username', 'POST', {key: event.target.value}).then(response => {
-                if(response.success) {
-                  currentInputElement.addClass('success');
-                } else if(response.error) {
-                  currentInputElement.addClass('error');
-                  showError(type, response.error);
-                };
-              });
-            } else {
-              currentInputElement.addClass('success');
-            }
-          }
-          hideError(type);
-        }
-      }
-
-      let submitError = submitFormError();
-      if(event.target.keyCode === 13) {
-        if(submitError) return showError(type, submitError);
-
-        return submitForm();
-      }
-
-      if(submitError) $("#submit-btn").addClass('disabled');
-      else $("#submit-btn").removeClass('disabled');
-    });
-
-    $("input").on("focusout", function(event) {
-      if(validationInput.includes(event.target.name)) {
-        $(`.input-${event.target.name}`).removeClass('success');
-      }
-    });
   </script>
 </body>

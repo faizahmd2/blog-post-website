@@ -7,9 +7,9 @@
 
 <body class="background-image" style="overflow: hidden;">
   <%- include('partials/_navigation', { user }) -%>
-    <% if (posts.length) { %>
+    <% if (hasPosts) { %>
       <div class="posts">
-        <div class="input-group mb-3   searchbar">
+        <div class="input-group mb-3 searchbar">
           <div class="input-search-parent">
             <input id="search" type="text" class="form-control" placeholder="Search..." aria-label="Search" aria-describedby="button-addon2">
             <span id="clearSearch" class="clear-search">&times;</span>
@@ -17,47 +17,29 @@
           <!-- <button class="btn btn-primary" type="button" id="button-addon2">Search</button> -->
         </div>
         <div class="posts-container">
-          <div id="all-posts" class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-1">
-            <% posts.forEach(post => { %>
-              <div class="col">
-                <a href="#" class="disable-anchor-css">
-                  <div class="card mb-3">
-                      <h5 class="card-title-text"><%= post.title %></h5>
-                      <p class="mb-1 card-plain-text"><%= post.plainTextContent.slice(0, 172) + (post.plainTextContent.length > 172 ? "..." : "") %></p>
-                  </div>
-                </a>
-              </div>
-            <% }); %>
+          <div id="all-posts" class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-1">
+              <%- cards %>
           </div>
-          
         </div>
       </div>
       <div class="pagination-container">
         <div id="pagination"></div>
       </div>
-      <% } else if (user) { %>
-        <%- include('partials/_not_found', { data: { title: "No Posts Found", sub_title: "It seems there are no posts available.", link: "/add-post", link_text: "Add New Post" } }) -%>
-      <% } else { %>
-        <%- include('partials/_not_found', { data: {title: "No Posts Found", sub_title: "Get Login to add your own posts.", link: "/login", link_text: "Go To Login"} }) -%>
-      <% } %>
+    <% } else if (user) { %>
+      <%- include('partials/_not_found', { data: { title: "No Posts Found", sub_title: "It seems there are no posts available.", link: "/add-post", link_text: "Add New Post" } }) -%>
+    <% } else { %>
+      <%- include('partials/_not_found', { data: {title: "No Posts Found", sub_title: "Get Login to add your own posts.", link: "/login", link_text: "Go To Login"} }) -%>
+    <% } %>
 
   <!-- Simple Pagination js -->
   <!-- <script src="/public/vendor/jquery/js/jquery.min.js"></script> -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/simplePagination.js/1.6/jquery.simplePagination.min.js" integrity="sha512-9Dh726RTZVE1k5R1RNEzk1ex4AoRjxNMFKtZdcWaG2KUgjEmFYN3n17YLUrbHm47CRQB1mvVBHDFXrcnx/deDA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
   <script src="js/utility.js"></script>
   <script>
-    let totalPosts = '<%= totalPosts %>';
-    let postsPerPage = '<%= postsPerPage %>';
-    let totalPage = '<%= totalPage %>';
-    let currentPage = '<%= currentPage %>';
     const debouncedListChange = debounce(handleListChange, 600);
 
     $(document).ready(function(){
-      // Initialize pagination
-      if(totalPage > 1) {
-        initPagination(totalPosts, totalPage, postsPerPage, currentPage);
-      }
-
+      initScript();
       $("#search").on("input", function() {
         debouncedListChange(this.value,"");
       });
@@ -68,61 +50,60 @@
       })
     });
 
+    function initScript () {
+      // Initialize pagination
+      const pageInfoElem = document.getElementById("page-info-hidden");
+      const data = JSON.parse(pageInfoElem.innerText);
+
+      const queryParams = parseSearchQuery();
+      if(queryParams.search) $("#search").val(queryParams.search);
+
+      $('#pagination').pagination('destroy');
+      if(data.totalPage > 1) {
+        initPagination(data.totalPage, data.currentPage);
+      } else {
+        $(".posts-container").css('max-height', '75vh');
+      }
+    }
+
     function handleListChange(search, page) {
       showLoader();
       setSearchQueryParam({"search": search, "page": page});
-      getPostsByApi().then(response => {
-        appendPostsCard(response);
-          hideLoader();
+      getPostsByApi().then(e => {
+        hideLoader();
       });
     }
 
     async function getPostsByApi() {
-      let url = "/posts" + window.location.search;
+      let locationSearch = window.location.search;
+      let template_url = "/api/posts/cards" + locationSearch;
+      let response_template = await fetchData(template_url);
 
-      let response = await fetchData(url);
+      if(response_template.status != 226) return notify.error("Some error occured");
 
-      if(response.error) return notify.error(response.error);
-
-      if(!response.success) return notify.error("Some error occured");
-
-      return response;
+      appendPostsCard(response_template.decompressedData);
+      initScript();
     }
 
-    function initPagination(items, pages, itemsOnPage, currentPage=1) {
+    function initPagination(pages, currentPage=1) {
       $('#pagination').pagination({
-        items: items,
-        itemsOnPage: itemsOnPage,
+        pages: pages,
         currentPage: currentPage,
         displayedPages: 3,
         cssStyle: 'light-theme',
         onPageClick: function(pageNumber, event) {
           event.preventDefault();
-          debouncedListChange($("#search").val(), pageNumber);
+          showLoader();
+          handleListChange($("#search").val(), pageNumber);
         }
       });
     }
 
-    function appendPostsCard(response) {
+    function appendPostsCard(template) {
       const parentDiv = document.getElementById('all-posts');
       parentDiv.innerHTML = '';
-      for(let post of response.posts) {
-        let template = getPostCardHtml(post);
-        $('#all-posts').append(template);
-      }
+      $('#all-posts').append(template);
     }
-
-    function getPostCardHtml(post) {
-      return `<div class="col">
-        <a href="#" class="disable-anchor-css">
-          <div class="card mb-2">
-              <h5 class="card-title-text">${post.title}</h5>
-              <p class="card-plain-text">${post.plainTextContent.slice(0, 172) + (post.plainTextContent.length > 172 ? "..." : "")}</p>
-          </div>
-        </a>
-      </div>`
-    }
-
   </script>
 </body>
 

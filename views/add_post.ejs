@@ -84,7 +84,7 @@
 
       if(validationError) return notify.error(validationError);
 
-      let response = await fetchData('/add-post', 'POST', formData);
+      let response = await fetchData('/api/add-post', 'POST', formData);
 
       if(response.error) return notify.error(response.error);
 

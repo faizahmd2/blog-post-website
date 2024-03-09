@@ -88,7 +88,7 @@ module.exports = {
   renderLogin: (req, res) => {
     let isSignup = req.query.register == "1";
 
-    req.options = { isSignup };
+    req.options['isSignup'] = isSignup;
     pageRender(req, res, "login");
   },
   createUsernameValidation: async function(req, res) {
