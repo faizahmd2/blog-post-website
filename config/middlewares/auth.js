@@ -11,22 +11,21 @@ var exportAuth = {
     userTokenInfo: function(req, res, next) {
         let url = req.url;
         if(url.includes(".")) return next();
-
+        
         const token = req.cookies && req.cookies.token;
         if (!token) {
             req.tokenMessage = 'Invalid Authorization';
             return next();
         }
-    
+        
+        req.options = {};
         try {
             let result = verify(token);
 
             req.user = result;
 
             if(!url.includes("/api/")) {
-                req.options = {
-                    user: result
-                }
+                req.options['user'] = result;
             }
 
             next();
