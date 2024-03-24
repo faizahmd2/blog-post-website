@@ -27,7 +27,7 @@
         <div id="pagination"></div>
       </div>
     <% } else if (user) { %>
-      <%- include('partials/_not_found', { data: { title: "No Posts Found", sub_title: "It seems there are no posts available.", link: "/add-post", link_text: "Add New Post" } }) -%>
+      <%- include('partials/_not_found', { data: { title: "No Posts Found", sub_title: "It seems there are no posts available.", link: "/add_post", link_text: "Add New Post" } }) -%>
     <% } else { %>
       <%- include('partials/_not_found', { data: {title: "No Posts Found", sub_title: "Get Login to add your own posts.", link: "/login", link_text: "Go To Login"} }) -%>
     <% } %>
