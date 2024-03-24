@@ -1,7 +1,11 @@
 <% if (card.redirect) { %>
 <a href="<%= card.redirect %>" class="disable-anchor-css">
 <% } %>
-    <div class="custom-card-container">
+    <% if (card.onclick) { %>
+        <div class="custom-card-container" onclick="onCustomCardClicked('<%= card.onclick %>')">
+    <% } else { %>
+        <div class="custom-card-container">
+    <% } %>
         <div class="custom-card">
             <div class="custom-card__actions">
                 <div class="left-actions">

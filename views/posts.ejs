@@ -8,6 +8,7 @@
 <body class="background-image" style="overflow: hidden;">
   <%- include('partials/_navigation', { user }) -%>
     <% if (hasPosts) { %>
+      <div id="post-modal-parent"></div>
       <div class="posts">
         <div class="input-group mb-3 searchbar">
           <div class="input-search-parent">
@@ -37,6 +38,7 @@
   <script src="js/utility.js"></script>
   <script>
     const debouncedListChange = debounce(handleListChange, 600);
+    var modalEditor, initialContent = null, postModal=null;
 
     $(document).ready(function(){
       initScript();
@@ -48,11 +50,24 @@
         handleListChange("", "");
         $("#search").val("");
       })
+
+      document.addEventListener("fullscreenchange", function() {
+        if (!document.fullscreenElement) {
+          onCompressPostModal();
+        }
+      });
+
+      document.addEventListener("keydown", function(event) {
+        if (event.key === "f" || event.key === "F" && postModal) {
+          toggleFullscreen(postModal);
+        }
+      });
     });
 
     function initScript () {
       // Initialize pagination
       const pageInfoElem = document.getElementById("page-info-hidden");
+      if(!pageInfoElem) return;
       const data = JSON.parse(pageInfoElem.innerText);
 
       const queryParams = parseSearchQuery();
@@ -63,6 +78,139 @@
         initPagination(data.totalPage, data.currentPage);
       } else {
         $(".posts-container").css('max-height', '75vh');
+      }
+    }
+
+    function onCustomCardClicked(id) {
+      showLoader();
+      getPost(id).then(data => {
+        showModal();
+        initPostModal(data);
+        postModal = "compress";
+        hideLoader();
+      });
+    }
+
+    async function getPost(id) {
+      let post_url = "/api/post/" + id;
+      let response_post = await fetchData(post_url);
+
+      if(!response_post.success) return notify.error("Some error occured");
+
+      return response_post;
+    }
+
+    function initializeQuillEditor(content) {
+      const toolbarOptions = getToolbarOptions();
+      modalEditor = new Quill('#post-editor', {
+        modules: {
+          toolbar: toolbarOptions
+        },
+        theme: 'bubble'
+      });
+      const parsedContent = JSON.parse(content);
+      modalEditor.setContents(parsedContent); 
+      modalEditor.enable(false);
+      return modalEditor;
+    }
+
+    function clearModal() {
+      hideModal();
+      const modalParent = document.getElementById("post-modal-parent");
+      modalParent.innerHTML = '';
+    }
+
+    function initPostModal(data) {
+      const html = data['modalHtml'];
+      $("#post-modal-parent").append(html);
+      initializeQuillEditor(data.content, data.editable);
+
+      $("#post-modal-parent").on("click", function(event){
+        if (event.target.hasAttribute('custom-modal-close')) {
+          closeFullscreen();
+          postModal = null;
+          clearModal();
+        }
+        
+        if (event.target.hasAttribute('custom-modal-expand')) {
+          onExpandPostModal();
+        }
+
+        if (event.target.hasAttribute('custom-modal-compress')) {
+          onCompressPostModal();
+        }
+
+        if (event.target.hasAttribute('edit-modal')) {
+          onEditPostModal();
+        }
+
+        if (event.target.hasAttribute('edit-modal-clear')) {
+          onClearPostModal();
+        }
+
+        if (event.target.hasAttribute('edit-modal-save')) {
+          onSavePostModal();
+        }
+
+        // const element = document.querySelector('.ql-editor');
+        // document.addEventListener("selectionchange", (event) => {
+        //   // Access and copy selected text here (optional)
+        //   const selectedText = window.getSelection().toString().trim();
+        //   event.preventDefault();
+        // });
+      });
+    }
+
+    function onExpandPostModal() {
+      openFullscreen(document.getElementById("post-modal-parent"));
+      $("i[custom-modal-expand]").hide();
+      $("i[custom-modal-compress]").show();
+      const parentEl = document.querySelector('.custom-modal-parent');
+      parentEl.classList.add("full");
+      postModal = "expand";
+    }
+
+    function onCompressPostModal() {
+      closeFullscreen();
+      $("i[custom-modal-expand]").show();
+      $("i[custom-modal-compress]").hide();
+      const parentEl = document.querySelector('.custom-modal-parent');
+      parentEl.classList.remove("full");
+      postModal = "compress";
+    }
+
+    function toggleFullscreen(mode) {
+      if(mode == "compress") {
+        onExpandPostModal();
+      } else if(mode == "expand") {
+        onCompressPostModal();
+      }
+    }
+
+    function onEditPostModal() {
+      if(modalEditor) {
+        initialContent = modalEditor.getContents();
+        modalEditor.enable(true);
+        modalEditor.focus();
+        event.target.classList.add('hide');
+        $("#post-modal-parent .icons button[edit-modal-save]").removeClass('hide');
+        $("#post-modal-parent .icons button[edit-modal-clear]").removeClass('hide');
+      }
+    }
+
+    function onSavePostModal() {
+      if(modalEditor) {
+        let finalContent = modalEditor.getContents();
+      }
+    }
+
+    function onClearPostModal() {
+      if(initialContent && modalEditor) {
+        modalEditor.setContents(initialContent);
+        modalEditor.enable(false);
+        event.target.classList.add('hide');
+        $("#post-modal-parent .icons button[edit-modal-save]").addClass('hide');
+        $("#post-modal-parent .icons i[edit-modal]").removeClass('hide');
       }
     }
 
@@ -103,6 +251,36 @@
       const parentDiv = document.getElementById('all-posts');
       parentDiv.innerHTML = '';
       $('#all-posts').append(template);
+    }
+
+    function getToolbarOptions() {
+      const device = deviceInfo();
+      // notify.success(JSON.stringify(device));
+      if(device.mobile) {
+        // Mobile configuration
+        return [
+          ['bold', 'italic', 'underline', 'strike'],        // toggled buttons
+          [{ 'align': [] }],
+          ['blockquote', 'code-block'],
+          ['link'],
+          [{ 'list': 'bullet' }],
+          [{ 'size': ['small', false, 'large', 'huge'] }],
+          [{ 'color': [] }, { 'background': [] }],
+          [{ 'font': [] }]
+        ];
+      } else {
+        return [
+          ['bold', 'italic', 'underline', 'strike'],        // toggled buttons
+          [{ 'align': [] }],
+          ['blockquote', 'code-block'],
+          ['link','formula'],
+          [{ 'list': 'ordered'}, { 'list': 'bullet' }, { 'list': 'check' }],
+          [{ 'indent': '-1'}, { 'indent': '+1' }],          // outdent/indent
+          [{ 'size': ['small', false, 'large', 'huge'] }],  // custom dropdown
+          [{ 'color': [] }, { 'background': [] }],          // dropdown with defaults from theme
+          [{ 'font': [] }]
+        ];
+      }
     }
   </script>
 </body>

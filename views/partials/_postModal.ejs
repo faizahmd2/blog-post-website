@@ -1,0 +1,28 @@
+<!-- <link rel="stylesheet" href="vendor/quillJs/css/quill.bubble.min.css"> -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/quill/1.3.7/quill.bubble.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+<div click-scale-effect id="custom-modal">
+    <div class="custom-modal-parent">
+        <div class="custom-model-content">
+            <div class="header">
+                <div class="icons">
+                    <% if (post.editable) { %>
+                        <button edit-modal-save class="btn btn-primary hide">Save</button>
+                        <button edit-modal-clear class="btn btn-warning hide">Clear</button>
+                        <i edit-modal class="fas fa-edit" title="Edit Post"></i>
+                    <% } %>
+                    <i custom-modal-expand class="fas fa-expand" title="Fullscreen"></i>
+                    <i custom-modal-compress class="fas fa-compress" style="display: none;" title="Exit Fullscreen"></i>
+                    <i custom-modal-close class="fas fa-times" title="Close"></i>
+                </div>
+                <h4 class="title"><%= post.title %></h4>
+            </div>
+            <div class="section">
+                <div id="post-editor"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/quill/2.0.0-beta.0/quill.min.js" integrity="sha512-P2W2rr8ikUPfa31PLBo5bcBQrsa+TNj8jiKadtaIrHQGMo6hQM6RdPjQYxlNguwHz8AwSQ28VkBK6kHBLgd/8g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script> -->
+<script src="vendor/quillJs/js/quill.min.js"></script>

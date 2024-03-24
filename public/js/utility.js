@@ -209,3 +209,45 @@ function debounce(fn, delay) {
     }, delay);
   };
 }
+
+function showModal() {
+  $("#custom-modal").addClass("visible");
+  $("#custom-modal").removeClass("hidden");
+}
+
+function hideModal() {
+  $("#custom-modal").addClass("hidden");
+  $("#custom-modal").removeClass("visible");
+}
+
+function openFullscreen(element) {
+  if (document.fullscreenElement) {
+    return;
+  }
+
+  if (element.requestFullscreen) {
+    element.requestFullscreen();
+  } else if (element.webkitRequestFullscreen) { /* Safari */
+    element.webkitRequestFullscreen();
+  } else if (element.mozRequestFullscreen) { /* Firefox */
+    element.mozRequestFullscreen();
+  } else {
+    console.log("Fullscreen is not supported by your browser.");
+  }
+}
+
+function closeFullscreen() {
+  if (!document.fullscreenElement) {
+    return;
+  }
+
+  if (document.exitFullscreen) {
+    document.exitFullscreen();
+  } else if (document.webkitExitFullscreen) { /* Safari */
+    document.webkitExitFullscreen();
+  } else if (document.mozCancelFullScreen) { /* Firefox */
+    document.mozCancelFullScreen();
+  } else {
+    console.log("Fullscreen is not supported by your browser.");
+  }
+}

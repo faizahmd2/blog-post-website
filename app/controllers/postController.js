@@ -61,7 +61,7 @@ exports.getCardsTemplate = async function(req, res) {
     
     let cards = ``;
     for(let post of posts) {
-      const cardInfo = { card: { initial: post.initial || "FA", title: post.title, description: post.plainTextContent, admin: post.admin }};
+      const cardInfo = { card: { initial: post.initial || "FA", onclick: post._id, title: post.title, description: post.contentText, admin: post.admin }};
       const renderedPartial = ejs.render(_card, cardInfo);
       cards += renderedPartial;
     }
@@ -93,14 +93,26 @@ exports.getPostByID = async (req, res) => {
   pageRender(req, res, 'post');
 };
 
+exports.getPost = async (req, res) => {
+  if(!req.params.id) return sendResponse(res, 400, "Parameters Missing");
+
+  const post = await Post.findById(req.params.id);
+  const _post = fs.readFileSync('views/partials/_postModal.ejs', 'utf8');
+
+  const postInfo = { post: { content: post.content, title: post.title, description: post.contentText, editable: req.user && req.user.user_id == post.user_id.toString() }};
+  const renderedPartial = ejs.render(_post, postInfo);
+
+  res.json({success: true, modalHtml: renderedPartial, content: post.content});
+};
+
 exports.createPost = async (req, res) => {
-  let { title, content, plainTextContent, publicPost } = req.body;
-  if (!title || !plainTextContent || plainTextContent.length <= 1 || typeof publicPost != "boolean") return sendResponse(res, 400, "Invalid Parameter Request");
+  let { title, content, contentText, publicPost } = req.body;
+  if (!title || !contentText || contentText.length <= 1 || typeof publicPost != "boolean") return sendResponse(res, 400, "Invalid Parameter Request");
 
   await Post.create({
     title: title,
     content: content || "",
-    plainTextContent: plainTextContent,
+    contentText: contentText,
     publicPost: publicPost,
     user_id: req.user.user_id,
     status: 1,
@@ -140,7 +152,7 @@ var helper = {
         conditions.push({
           $or: [
             { title: { $regex: search, $options: 'i' } },
-            { plainTextContent: { $regex: search, $options: 'i' } }
+            { contentText: { $regex: search, $options: 'i' } }
           ]
         })
       }

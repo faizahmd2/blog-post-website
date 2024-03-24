@@ -414,21 +414,6 @@ a.dd-menu-item:hover {
   background-color: #ccc;
 }
 
-@media (max-width: 768px) {
-  .custom-card-container .custom-card {
-      max-width: 100%;
-      padding: 0.7em;
-  }
-
-  .custom-card-container .custom-card__title {
-      font-size: 1em;
-  }
-
-  .custom-card-container .custom-card__text {
-      font-size: .9em;
-  }
-}
-
 @keyframes progress {
   from { background-position: 0 0; }
   to { background-position: -100% 0; }
@@ -461,9 +446,10 @@ a.dd-menu-item:hover {
   display: none;
 }
 
-#custom-modal .custom-modal-parent {
+#custom-modal .custom-modal-parent,
+#custom-modal .custom-modal-parent-full {
   margin-top: 3.5em;
-  background-color: #ffffffde;
+  background-color: #efe6e6;
   padding: 0 1em 1em;
   border-radius: 5px;
   box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
@@ -472,6 +458,15 @@ a.dd-menu-item:hover {
   width: 80vw;
   max-height: 87vh;
   overflow-y: auto;
+}
+
+#custom-modal .custom-modal-parent.full {
+  width: 100vw;
+  height: 100vh;
+  border-radius: 0;
+  min-height: unset;
+  max-height: unset;
+  margin: 0;
 }
 
 #custom-modal .custom-modal-parent::-webkit-scrollbar {
@@ -497,23 +492,63 @@ a.dd-menu-item:hover {
 #custom-modal .header .icons {
   display: flex;
   justify-content: flex-end;
-  margin-top: 0.4em;
-  gap: 6px;
+  margin-top: 0.6em;
+  gap: 10px;
+  align-items: center;
 }
 
 #custom-modal .header .icons i {
   cursor: pointer;
 }
 
-#custom-modal .section #editor {
+#custom-modal .header .icons i[custom-modal-close] {
+  font-size: 1.5em;
+}
+
+#custom-modal .header .icons i[custom-modal-expand],
+#custom-modal .header .icons i[edit-modal],
+#custom-modal .header .icons i[custom-modal-compress] {
+  font-size: 1.1em;
+}
+
+#custom-modal .header .icons button {
+  padding: 0.5em 1em;
+  color: #fff;
+}
+
+#custom-modal .section #post-editor {
   font-size: 1em;
 }
 
-#custom-modal .section #editor .ql-editor {
+#custom-modal .section #post-editor .ql-editor {
   overflow: hidden;
 }
 
 @keyframes custom-modal-open {
   from { transform: scale(0.8); }
   to { transform: scale(1); }
+}
+
+@media (max-width: 768px) {
+  .custom-card-container .custom-card {
+      max-width: 100%;
+      padding: 0.7em;
+  }
+
+  .custom-card-container .custom-card__title {
+      font-size: 1em;
+  }
+
+  .custom-card-container .custom-card__text {
+      font-size: .9em;
+  }
+
+  #custom-modal .custom-modal-parent {
+    width: 98vw;
+    margin-top: .5em;
+  }
+
+  #custom-modal .custom-modal-parent::-webkit-scrollbar {
+    width: 0.2em;
+  }
 }

@@ -8,7 +8,7 @@ const PostSchema = new Schema({
   },
   title: String,
   content: String,
-  plainTextContent: String,
+  contentText: String,
   publicPost: {
     type: Boolean,
     default: false
