@@ -8,8 +8,7 @@ const config = require('../../config/config');
 module.exports = {
   logout: function(req, res, next) {
     res.clearCookie('token');
-    req.user = null;
-    pageRender(req, res, 'index');
+    res.redirect('/');
   },
   registerUser: async (req, res) => {
     try {

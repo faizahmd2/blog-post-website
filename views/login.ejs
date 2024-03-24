@@ -174,7 +174,7 @@
         notify.success("Logged In Successfully!");
         setTimeout(() => {
           window.location.href = '/';
-        }, 2000)
+        }, 1000)
       } else {
         if(response.status != 201) return notify.error("Could Not Register User!");
         notify.success("Registered!! Please Login");

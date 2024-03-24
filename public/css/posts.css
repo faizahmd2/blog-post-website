@@ -111,9 +111,9 @@
     transition: width 0.3s ease-in-out;
 }
 
-.input-search-parent input:focus {
+/* .input-search-parent input:focus {
     width: 100%;
-}
+} */
 
 .input-search-parent span {
     position: absolute;
@@ -184,4 +184,14 @@
         width: 50vw;
     }
 
+}
+
+@media only screen and (min-width: 768px) {
+    .input-search-parent input {
+        width: 20em;
+    }
+
+    .input-search-parent .clear-search {
+        right: 0.4em;
+    }
 }

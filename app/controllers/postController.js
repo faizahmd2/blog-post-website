@@ -6,7 +6,14 @@ const { pageRender, sendResponse, errorTemplate, renderTemplate } = require('../
 const postsPerPage = 50;
 
 exports.homePage = async (req, res) => {
-  pageRender(req, res, 'index');
+  req.internally = true;
+  req.ishome = true;
+  const { cards, hasPosts } = await exports.getCardsTemplate(req);
+
+  req.options['hasPosts'] = hasPosts;
+  req.options['cards'] = cards;
+
+  pageRender(req, res, 'posts');
 }
 
 exports.testPage = async (req, res) => {
@@ -121,6 +128,19 @@ exports.createPost = async (req, res) => {
   res.json({ success: true });
 };
 
+exports.updatePost = async function (req, res) {
+  let { content, contentText, id } = req.body;
+  if (!contentText || contentText.length <= 1) return sendResponse(res, 400, "Invalid Parameter Request");
+
+  const filter = { _id: id };
+
+  const update = { $set: { contentText, content } };
+
+  const result = await Post.updateOne(filter, update);
+
+  res.json({ success: true });
+}
+
 exports.deletePost = async (req, res) => {
   const post = await Post.findOne({ _id: req.params.id });
   let deletedImage = './public' + post.image;
@@ -138,12 +158,16 @@ var helper = {
 
       let conditions = [{status: 1}];
       if (req.user) {
-        conditions.push({
+        let q = {
           "$or": [
-            { publicPost: true },
-            { publicPost: false, user_id: req.user.user_id }
+            { publicPost: true }
           ]
-        });
+        }
+
+        if(!req.isHome) {
+          q['$or'].push({ publicPost: false, user_id: req.user.user_id });
+        }
+        conditions.push(q);
       } else {
         conditions.push({ publicPost: true });
       }

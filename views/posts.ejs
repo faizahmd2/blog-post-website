@@ -38,7 +38,7 @@
   <script src="js/utility.js"></script>
   <script>
     const debouncedListChange = debounce(handleListChange, 600);
-    var modalEditor, initialContent = null, postModal=null;
+    var modalEditor, initialContent = null, postModal=null, postModalId = null;
 
     $(document).ready(function(){
       initScript();
@@ -58,7 +58,8 @@
       });
 
       document.addEventListener("keydown", function(event) {
-        if (event.key === "f" || event.key === "F" && postModal) {
+        let isFocused = modalEditor && modalEditor.hasFocus();
+        if ((event.key === "f" || event.key === "F") && postModal && modalEditor && !isFocused) {
           toggleFullscreen(postModal);
         }
       });
@@ -87,6 +88,7 @@
         showModal();
         initPostModal(data);
         postModal = "compress";
+        postModalId = id;
         hideLoader();
       });
     }
@@ -129,6 +131,7 @@
         if (event.target.hasAttribute('custom-modal-close')) {
           closeFullscreen();
           postModal = null;
+          postModalId = null;
           clearModal();
         }
         
@@ -198,9 +201,21 @@
       }
     }
 
-    function onSavePostModal() {
+    async function onSavePostModal() {
       if(modalEditor) {
-        let finalContent = modalEditor.getContents();
+        const contentText = modalEditor.getText(0, modalEditor.getLength());
+        const currentContent = JSON.stringify(modalEditor.getContents());
+
+        if(!contentText || contentText == "" || contentText.length <= 1) return notify.error("Post Content can't be empty");
+
+        let response = await fetchData('/api/add-post', 'PUT', {id: postModalId, contentText, content: currentContent});
+
+        if(response.error) return notify.error(response.error);
+
+        if(!response.success) return notify.error("Some error occured");
+
+        initialContent = modalEditor.getContents();
+        onClearPostModal();
       }
     }
 
@@ -208,8 +223,8 @@
       if(initialContent && modalEditor) {
         modalEditor.setContents(initialContent);
         modalEditor.enable(false);
-        event.target.classList.add('hide');
         $("#post-modal-parent .icons button[edit-modal-save]").addClass('hide');
+        $("#post-modal-parent .icons button[edit-modal-clear]").addClass('hide');
         $("#post-modal-parent .icons i[edit-modal]").removeClass('hide');
       }
     }
