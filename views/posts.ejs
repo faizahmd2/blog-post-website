@@ -97,7 +97,7 @@
 
     function onCustomCardDelete(id) {
       if(isLoading) return;
-      
+
       showLoader();
       deletePost(id).then((res) => {
         console.log("AFTER REM",res);
@@ -232,6 +232,8 @@
     }
 
     async function onSavePostModal() {
+      if(isLoading) return;
+      
       showLoader();
       if(modalEditor && postModalId) {
         const contentText = modalEditor.getText(0, modalEditor.getLength());
@@ -252,6 +254,8 @@
     }
 
     async function onPostVisiblityChange(mode) {
+      if(isLoading) return;
+
       showLoader();
       if(modalEditor && postModalId) {
         let response = await fetchData('/api/add-post', 'PUT', {id: postModalId, visiblity: mode, type: "visiblity"});
