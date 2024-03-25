@@ -8,7 +8,7 @@ const postsPerPage = 50;
 
 exports.homePage = async (req, res) => {
   req.internally = true;
-  req.ishome = true;
+  req.isHome = true;
   const { cards, hasPosts } = await exports.getCardsTemplate(req);
 
   req.options['hasPosts'] = hasPosts;
