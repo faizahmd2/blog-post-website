@@ -64,12 +64,12 @@ exports.getCardsTemplate = async function(req, res) {
     const page = req.query.page || 1;
     const skip = (page - 1) * postsPerPage;
     
-    const posts = await Post.find(query).skip(skip).limit(postsPerPage).lean();
+    const posts = await Post.find(query).skip(skip).limit(postsPerPage).populate("user_id", "initial").lean();
     const _card = fs.readFileSync('views/partials/_card.ejs', 'utf8');
     
     let cards = ``;
     for(let post of posts) {
-      const cardInfo = { card: { initial: post.initial || "FA", onclick: post._id, title: post.title, description: post.contentText, admin: post.admin }};
+      const cardInfo = { card: { initial: post.user_id.initial || "NA", onclick: post._id, title: post.title, description: post.contentText, admin: req.user && (post.user_id.toString() == req.user.user_id) }};
       const renderedPartial = ejs.render(_card, cardInfo);
       cards += renderedPartial;
     }
