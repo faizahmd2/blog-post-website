@@ -368,7 +368,7 @@ a.dd-menu-item:hover {
   overflow: hidden;
   text-overflow: ellipsis;
   display: -webkit-box;
-  -webkit-line-clamp: 3;
+  -webkit-line-clamp: 4;
   -webkit-box-orient: vertical;
   margin-bottom: 0;
 }
@@ -512,7 +512,7 @@ a.dd-menu-item:hover {
 }
 
 #custom-modal .header .icons button {
-  padding: 0.5em 1em;
+  padding: 0.2em .5em;
   color: #fff;
 }
 
@@ -533,6 +533,7 @@ a.dd-menu-item:hover {
   .custom-card-container .custom-card {
       max-width: 100%;
       padding: 0.7em;
+      height: 87%;
   }
 
   .custom-card-container .custom-card__title {
@@ -541,6 +542,7 @@ a.dd-menu-item:hover {
 
   .custom-card-container .custom-card__text {
       font-size: .9em;
+      line-height: 1.2;
   }
 
   #custom-modal .custom-modal-parent {

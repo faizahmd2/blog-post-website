@@ -3,6 +3,7 @@ const fs = require('fs');
 const ejs = require('ejs');
 const zlib = require('zlib');
 const { pageRender, sendResponse, errorTemplate, renderTemplate } = require('../../helper/util');
+const { isValidObjectId } = require('mongoose');
 const postsPerPage = 50;
 
 exports.homePage = async (req, res) => {
@@ -130,13 +131,14 @@ exports.createPost = async (req, res) => {
 
 exports.updatePost = async function (req, res) {
   let { content, contentText, id } = req.body;
-  if (!contentText || contentText.length <= 1) return sendResponse(res, 400, "Invalid Parameter Request");
-
-  const filter = { _id: id };
+  if (!contentText || contentText.length <= 1 || !isValidObjectId(id)) return sendResponse(res, 400, "Invalid Parameter Request");
 
   const update = { $set: { contentText, content } };
+  const filter = {user_id: req.user.user_id, _id: id};
 
-  const result = await Post.updateOne(filter, update);
+  const post = await Post.findOneAndUpdate(filter, update);
+
+  if(!post) return sendResponse(res, 400, "Invalid Request!");
 
   res.json({ success: true });
 }
@@ -164,8 +166,10 @@ var helper = {
           ]
         }
 
-        if(!req.isHome) {
+        if(req.isHome) {
           q['$or'].push({ publicPost: false, user_id: req.user.user_id });
+        } else {
+          q = { user_id: req.user.user_id };
         }
         conditions.push(q);
       } else {
