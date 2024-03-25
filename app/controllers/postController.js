@@ -69,7 +69,7 @@ exports.getCardsTemplate = async function(req, res) {
     
     let cards = ``;
     for(let post of posts) {
-      const cardInfo = { card: { initial: post.user_id.initial || "NA", onclick: post._id, title: post.title, description: post.contentText, admin: req.user && (post.user_id.toString() == req.user.user_id) }};
+      const cardInfo = { card: { name: post.user_id.name, initial: post.user_id.initial || "NA", onclick: post._id, title: post.title, description: post.contentText, admin: req.user && post.user_id && (post.user_id._id.toString() == req.user.user_id) }};
       const renderedPartial = ejs.render(_card, cardInfo);
       cards += renderedPartial;
     }
@@ -107,7 +107,7 @@ exports.getPost = async (req, res) => {
   const post = await Post.findById(req.params.id);
   const _post = fs.readFileSync('views/partials/_postModal.ejs', 'utf8');
 
-  const postInfo = { post: { content: post.content, title: post.title, description: post.contentText, editable: req.user && req.user.user_id == post.user_id.toString() }};
+  const postInfo = { post: { content: post.content, title: post.title, description: post.contentText, publish: !post.publicPost, editable: req.user && req.user.user_id == post.user_id.toString() }};
   const renderedPartial = ejs.render(_post, postInfo);
 
   res.json({success: true, modalHtml: renderedPartial, content: post.content});
@@ -130,10 +130,23 @@ exports.createPost = async (req, res) => {
 };
 
 exports.updatePost = async function (req, res) {
-  let { content, contentText, id } = req.body;
-  if (!contentText || contentText.length <= 1 || !isValidObjectId(id)) return sendResponse(res, 400, "Invalid Parameter Request");
+  let { content, contentText, id, type, visiblity } = req.body;
+  if (!type || !isValidObjectId(id)) return sendResponse(res, 400, "Invalid Parameter Request");
 
-  const update = { $set: { contentText, content } };
+  let set;
+  if(type == "edit" && (contentText || contentText.length > 1)) {
+    set = { contentText, content };
+  } else if(type == "visiblity" && visiblity && (visiblity == "private" || visiblity == "publish")) {
+    let publicPost = visiblity == "publish";
+    set = { publicPost: publicPost };
+  } else if(type == "remove") {
+    set = { status: 0 };
+    return sendResponse(res, 400, "CUSTOM ERR");
+  } else {
+    return sendResponse(res, 400, "Invalid Parameter Request");
+  }
+
+  const update = { $set: set };
   const filter = {user_id: req.user.user_id, _id: id};
 
   const post = await Post.findOneAndUpdate(filter, update);
@@ -142,14 +155,6 @@ exports.updatePost = async function (req, res) {
 
   res.json({ success: true });
 }
-
-exports.deletePost = async (req, res) => {
-  const post = await Post.findOne({ _id: req.params.id });
-  let deletedImage = './public' + post.image;
-  fs.unlinkSync(deletedImage);
-  await Post.findOneAndRemove({ _id: post._id });
-  res.redirect('/');
-};
 
 var helper = {
   getPostsQuery: function (req) {

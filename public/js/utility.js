@@ -1,3 +1,5 @@
+var isLoading = false;
+
 function getCurrentBaseUrl() {
     return window.location.protocol + "//" + window.location.host;
 }
@@ -191,11 +193,13 @@ function getOrientation() {
 }
 
 function showLoader() {
+  isLoading = true;
   let progress = document.getElementById("custom-progress-bar");
   if(progress) progress.style.display = "block";
 }
 
 function hideLoader() {
+  isLoading = false;
   let progress = document.getElementById("custom-progress-bar");
   if(progress) progress.style.display = "none";
 }

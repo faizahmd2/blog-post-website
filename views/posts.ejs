@@ -83,6 +83,8 @@
     }
 
     function onCustomCardClicked(id) {
+      if(isLoading) return;
+
       showLoader();
       getPost(id).then(data => {
         showModal();
@@ -91,6 +93,24 @@
         postModalId = id;
         hideLoader();
       });
+    }
+
+    function onCustomCardDelete(id) {
+      if(isLoading) return;
+      
+      showLoader();
+      deletePost(id).then((res) => {
+        console.log("AFTER REM",res);
+        handleListChange();
+      });
+    }
+
+    async function deletePost(id) {
+      let response = await fetchData('/api/add-post', 'PUT', {id: postModalId, type: "remove"});
+
+      if(response.error) return notify.error(response.error);
+
+      if(!response.success) return notify.error("Some error occured");
     }
 
     async function getPost(id) {
@@ -157,6 +177,14 @@
           onSavePostModal();
         }
 
+        if (event.target.hasAttribute('edit-modal-publish')) {
+          onPostVisiblityChange("publish");
+        }
+
+        if (event.target.hasAttribute('edit-modal-private')) {
+          onPostVisiblityChange("private");
+        }
+
         // const element = document.querySelector('.ql-editor');
         // document.addEventListener("selectionchange", (event) => {
         //   // Access and copy selected text here (optional)
@@ -204,13 +232,14 @@
     }
 
     async function onSavePostModal() {
-      if(modalEditor) {
+      showLoader();
+      if(modalEditor && postModalId) {
         const contentText = modalEditor.getText(0, modalEditor.getLength());
         const currentContent = JSON.stringify(modalEditor.getContents());
 
         if(!contentText || contentText == "" || contentText.length <= 1) return notify.error("Post Content can't be empty");
 
-        let response = await fetchData('/api/add-post', 'PUT', {id: postModalId, contentText, content: currentContent});
+        let response = await fetchData('/api/add-post', 'PUT', {id: postModalId, contentText, content: currentContent, type: "edit"});
 
         if(response.error) return notify.error(response.error);
 
@@ -219,6 +248,40 @@
         initialContent = modalEditor.getContents();
         onClearPostModal();
       }
+      hideLoader();
+    }
+
+    async function onPostVisiblityChange(mode) {
+      showLoader();
+      if(modalEditor && postModalId) {
+        let response = await fetchData('/api/add-post', 'PUT', {id: postModalId, visiblity: mode, type: "visiblity"});
+
+        if(response.error) return notify.error(response.error);
+
+        if(!response.success) return notify.error("Some error occured");
+
+        afterPostVisibiltyChange(mode);
+      }
+      hideLoader();
+    }
+
+    function afterPostVisibiltyChange(mode) {
+      let currentAttr = `edit-modal-${mode}`;
+      const button = document.querySelector(`#post-modal-parent .icons button[${currentAttr}]`);
+
+      let newMode = mode == "publish" ? "private" : mode == "private" ? "publish" : "";
+      
+      if (button && newMode) {
+        let newAttr = `edit-modal-${newMode}`;
+        let newTxt = newMode == "publish" ? "Publish": "Private";
+        button.removeAttribute(currentAttr);
+        button.textContent = newTxt;
+        button.setAttribute(newAttr, '');
+        notify.success(mode == "publish" ? "Post is Public" : "Post is Private");
+      } else {
+        console.warn(`Button with edit-modal-${mode} attribute not found`);
+      }
+
     }
 
     function onClearPostModal() {

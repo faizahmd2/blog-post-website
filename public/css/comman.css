@@ -381,10 +381,10 @@ a.dd-menu-item:hover {
 }
 
 .custom-card-container .custom-card__actions .admin-actions {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
 }
 
 .custom-card-container .custom-card__action {
@@ -547,10 +547,14 @@ a.dd-menu-item:hover {
 
   #custom-modal .custom-modal-parent {
     width: 98vw;
-    margin-top: .5em;
+    margin-top: 3em;
   }
 
   #custom-modal .custom-modal-parent::-webkit-scrollbar {
     width: 0.2em;
+  }
+
+  a.dd-menu-item {
+    background-color: #841f314a;
   }
 }

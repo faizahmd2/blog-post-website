@@ -25,5 +25,4 @@ module.exports = function (app) {
   app.get('/api/post/:id', postController.getPost);
   app.post('/api/add-post', auth.requireLogin, postController.createPost);
   app.put('/api/add-post', auth.requireLogin, postController.updatePost);
-  app.delete('/api/posts/:id', auth.requireLogin, postController.deletePost);
 };
