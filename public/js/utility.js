@@ -131,9 +131,11 @@ const notyf = new Notyf({
 
 const notify = {
   error: (message) => {
+    hideLoader();
     notyf.error(message);
   },
   success: (message) => {
+    hideLoader();
     notyf.success(message);
   },
   info: (message) => {

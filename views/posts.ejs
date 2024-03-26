@@ -100,8 +100,10 @@
 
       showLoader();
       deletePost(id).then((res) => {
-        console.log("AFTER REM",res);
-        handleListChange();
+        if(res) {
+          clearModal();
+          handleListChange($("#search").val(), "");
+        }
       });
     }
 
@@ -111,6 +113,8 @@
       if(response.error) return notify.error(response.error);
 
       if(!response.success) return notify.error("Some error occured");
+
+      return id;
     }
 
     async function getPost(id) {
@@ -186,6 +190,12 @@
         else if (event.target.hasAttribute('edit-modal-private')) {
           if(confirm("Are you sure you want to make post private?")) {
             onPostVisiblityChange("private");
+          }
+        }
+
+        else if (event.target.hasAttribute('edit-modal-delete')) {
+          if(confirm("Are you sure you want to delete the post?")) {
+            onCustomCardDelete(postModalId);
           }
         }
 

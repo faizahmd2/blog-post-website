@@ -141,7 +141,6 @@ exports.updatePost = async function (req, res) {
     set = { publicPost: publicPost };
   } else if(type == "remove") {
     set = { status: 0 };
-    return sendResponse(res, 400, "CUSTOM ERR");
   } else {
     return sendResponse(res, 400, "Invalid Parameter Request");
   }
