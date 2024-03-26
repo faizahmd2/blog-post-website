@@ -147,7 +147,7 @@
       $("#post-modal-parent").append(html);
       initializeQuillEditor(data.content, data.editable);
 
-      $("#post-modal-parent").on("click", function(event){
+      $("#post-modal-parent .custom-model-content .icons").on("click", function(event){
         event.preventDefault();
         event.stopPropagation();
         if (event.target.hasAttribute('custom-modal-close')) {
@@ -157,32 +157,36 @@
           clearModal();
         }
         
-        if (event.target.hasAttribute('custom-modal-expand')) {
+        else if (event.target.hasAttribute('custom-modal-expand')) {
           onExpandPostModal();
         }
 
-        if (event.target.hasAttribute('custom-modal-compress')) {
+        else if (event.target.hasAttribute('custom-modal-compress')) {
           onCompressPostModal();
         }
 
-        if (event.target.hasAttribute('edit-modal')) {
+        else if (event.target.hasAttribute('edit-modal')) {
           onEditPostModal();
         }
 
-        if (event.target.hasAttribute('edit-modal-clear')) {
+        else if (event.target.hasAttribute('edit-modal-clear')) {
           onClearPostModal();
         }
 
-        if (event.target.hasAttribute('edit-modal-save')) {
+        else if (event.target.hasAttribute('edit-modal-save')) {
           onSavePostModal();
         }
 
-        if (event.target.hasAttribute('edit-modal-publish')) {
-          onPostVisiblityChange("publish");
+        else if (event.target.hasAttribute('edit-modal-publish')) {
+          if(confirm("Are you sure you want to make post public?")) {
+            onPostVisiblityChange("publish");
+          }
         }
 
-        if (event.target.hasAttribute('edit-modal-private')) {
-          onPostVisiblityChange("private");
+        else if (event.target.hasAttribute('edit-modal-private')) {
+          if(confirm("Are you sure you want to make post private?")) {
+            onPostVisiblityChange("private");
+          }
         }
 
         // const element = document.querySelector('.ql-editor');
