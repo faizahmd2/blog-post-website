@@ -8,18 +8,18 @@
                 <div class="icons">
                     <% if (post.editable) { %>
                         <% if (post.publish) { %>
-                            <button edit-modal-publish class="btn btn-info">Publish</button>
+                            <button edit-modal-publish class="btn btn-info" data-bs-toggle="tooltip" title="Make Post Visibility Public">Publish</button>
                         <% } else { %>
-                            <button edit-modal-private class="btn btn-info">Private</button>
+                            <button edit-modal-private class="btn btn-info" data-bs-toggle="tooltip" title="Make Post Visibility Private">Private</button>
                         <% } %>
-                        <button edit-modal-delete class="btn btn-danger">delete</button>
-                        <button edit-modal-save class="btn btn-primary hide">Save</button>
-                        <button edit-modal-clear class="btn btn-warning hide">Clear</button>
-                        <i edit-modal class="fas fa-edit" title="Edit Post"></i>
+                        <button edit-modal-delete class="btn btn-danger" data-bs-toggle="tooltip" title="Delete Post">delete</button>
+                        <button edit-modal-save class="btn btn-primary hide" data-bs-toggle="tooltip" title="Save Changes">Save</button>
+                        <button edit-modal-clear class="btn btn-warning hide" data-bs-toggle="tooltip" title="Discard Changes">Clear</button>
+                        <i edit-modal class="fas fa-edit" data-bs-toggle="tooltip" title="Edit Post"></i>
                     <% } %>
-                    <i custom-modal-expand class="fas fa-expand" title="Fullscreen"></i>
-                    <i custom-modal-compress class="fas fa-compress" style="display: none;" title="Exit Fullscreen"></i>
-                    <i custom-modal-close class="fas fa-times" title="Close"></i>
+                    <i custom-modal-expand class="fas fa-expand" data-bs-toggle="tooltip" title="Fullscreen"></i>
+                    <i custom-modal-compress class="fas fa-compress" style="display: none;" data-bs-toggle="tooltip" title="Exit Fullscreen"></i>
+                    <i custom-modal-close class="fas fa-times" data-bs-toggle="tooltip" title="Close"></i>
                 </div>
                 <h4 class="title"><%= post.title %></h4>
             </div>
@@ -32,3 +32,8 @@
 
 <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/quill/2.0.0-beta.0/quill.min.js" integrity="sha512-P2W2rr8ikUPfa31PLBo5bcBQrsa+TNj8jiKadtaIrHQGMo6hQM6RdPjQYxlNguwHz8AwSQ28VkBK6kHBLgd/8g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script> -->
 <script src="vendor/quillJs/js/quill.min.js"></script>
+<script>
+    var customModalTooltip = document.querySelectorAll('#custom-modal [data-bs-toggle="tooltip"]');
+    var customModalTooltipList = [...customModalTooltip].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl, 
+    { customClass: "custom-tooltip-post", placement: "bottom", container: "#custom-modal" }));
+</script>

@@ -147,6 +147,15 @@ img::-moz-selection {
   background-color: #00657b;
 }
 
+.btn-info {
+  background-color: #1490a8;
+}
+
+.btn-info:hover, .btn-info:focus, .btn-info:active {
+  color: #fff;
+  background-color: #326974;
+}
+
 .btn-lg {
   font-size: 16px;
   padding: 25px 35px;
@@ -312,7 +321,6 @@ a.dd-menu-item:hover {
   background-color: #ddd;
   overflow: hidden;
   box-shadow: 0 0 3px rgba(0, 0, 0, 0.2);
-  z-index: 999;
 }
 
 #custom-progress-bar::after {
@@ -435,7 +443,7 @@ a.dd-menu-item:hover {
   align-items: flex-start;
   opacity: 1;
   transition: opacity 0.3s ease-in-out;
-  z-index: 1100;
+  z-index: 1031;
 }
 
 #custom-modal.visible {
