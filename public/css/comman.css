@@ -492,6 +492,10 @@ a.dd-menu-item:hover {
 }
 
 #custom-modal .header .title {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
   margin-left: 0.5em;
   margin-bottom: 0;
   line-height: normal;
@@ -562,6 +566,10 @@ a.dd-menu-item:hover {
   color: #fff;
 }
 
+#navbarNav .navbar-brand img {
+  width: 10em;
+}
+
 .customSubMenuHolder:hover > #navigationUserMenu,
 .customSubMenuHolder:focus > #navigationUserMenu {
   display: flex;
@@ -574,6 +582,10 @@ a.dd-menu-item:hover {
 
   #navbarNav .nav-item {
     text-align: center;
+  }
+
+  #navbarNav .navbar-brand img {
+    width: 7em;
   }
 
   .custom-card-container .custom-card {

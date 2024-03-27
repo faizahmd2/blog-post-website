@@ -7,6 +7,10 @@
     margin: .5rem .5rem 0;
 }
 
+.posts .searchbar {
+    padding: 0 1em;
+}
+
 .posts-container {
     overflow-y: auto;
     max-height: 74vh;
@@ -187,6 +191,14 @@
 @media only screen and (max-width: 768px) {
     .ql-tooltip {
         width: 50vw;
+    }
+
+    #post-modal-parent .icons button:not(.hide) {
+        font-size: .67em;
+    }
+
+    #custom-modal .header .icons {
+        gap: 8px;
     }
 
 }
