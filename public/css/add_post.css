@@ -7,12 +7,12 @@
     border-radius: 4px;
     height: 80vh;
     padding: 0 2em;
-    margin: 11vh 5vw 0;
+    margin: 1rem 5vw 0;
 }
 
 .editor-container {
     width: 100%;
-    height: 67%;
+    height: 72%;
     margin-bottom: 2.8em;
 }
 
@@ -49,6 +49,7 @@
     display: flex;
     justify-content: flex-start;
     align-items: center;
+    gap: 5px;
 }
   
 .consent-public-check input {
@@ -61,7 +62,7 @@
 
 @media only screen and (min-width: 992px) {
     .form-container {
-        margin: 11vh 10vw 0;
+        margin: 1rem 10vw 0;
     }
 }
 

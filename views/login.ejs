@@ -2,7 +2,7 @@
 <link rel="stylesheet" href="css/login.css">
 
 <body class="background-image" style="overflow: hidden;">
-  <%- include('partials/_navigation', { user }) -%>
+  <%- include('partials/_navbar', { user }) -%>
     <div class="login full-screen-container">
       <div class="input-container">
         <h1 class="login-title">SIGN <%= isSignup ? 'UP' : 'IN' %></h1>
@@ -111,6 +111,7 @@
             }
             if(isSignup() && !currentInputElement.hasClass('success')) {
               if(type == "username") {
+                showLoader();
                 fetchData('/api/validate-username', 'POST', {key: event.target.value}).then(response => {
                   if(response.success) {
                     currentInputElement.addClass('success');
@@ -118,6 +119,7 @@
                     currentInputElement.addClass('error');
                     showError(type, response.error);
                   };
+                  hideLoader();
                 });
               } else {
                 currentInputElement.addClass('success');
@@ -165,7 +167,9 @@
       let formData = getFormData();
       let isLogin = !isSignup();
 
+      showLoader();
       let response = await fetchData(isLogin ? '/api/login' : '/api/signup', 'POST', formData);
+      hideLoader();
 
       if(response.error) return notify.error(response.error);
       
@@ -174,7 +178,7 @@
         notify.success("Logged In Successfully!");
         setTimeout(() => {
           window.location.href = '/';
-        }, 1000)
+        }, 700)
       } else {
         if(response.status != 201) return notify.error("Could Not Register User!");
         notify.success("Registered!! Please Login");

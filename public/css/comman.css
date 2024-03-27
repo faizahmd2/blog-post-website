@@ -255,7 +255,7 @@ img::-moz-selection {
   display: none;
   flex-direction: column;
   z-index: 9;
-  top: 2.4em;
+  top: 2.8em;
   width: 180px;
 }
 
@@ -307,7 +307,7 @@ a.dd-menu-item:hover {
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.8);
+  background-color: rgba(0, 0, 0, 0.6);
   z-index: -1;
 }
 
@@ -462,7 +462,7 @@ a.dd-menu-item:hover {
   border-radius: 5px;
   box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
   animation: custom-modal-open 0.3s ease-in-out forwards;
-  min-height: 40vh;
+  min-height: 87vh;
   width: 80vw;
   max-height: 87vh;
   overflow-y: auto;
@@ -537,7 +537,45 @@ a.dd-menu-item:hover {
   to { transform: scale(1); }
 }
 
+#navbarNav {
+  padding: 0.5em 1em;
+  background: transparent;
+  /* box-shadow: 3px 0px 3px rgb(232 0 81 / 93%); */
+}
+
+#navbarNav .hover-effect:hover {
+  background: #07616c;
+  opacity: .9;
+}
+
+#navbarNav a.nav-link {
+  font-family: 'Darker Grotesque', sans-serif;
+  color: #fff;
+  font-weight: 800;
+}
+
+#navbarNav .login-parent {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
+  color: #fff;
+}
+
+.customSubMenuHolder:hover > #navigationUserMenu,
+.customSubMenuHolder:focus > #navigationUserMenu {
+  display: flex;
+}
+
 @media (max-width: 768px) {
+  .background-image::before {
+    background-color: rgba(0, 0, 0, 0.41);
+  }
+
+  #navbarNav .nav-item {
+    text-align: center;
+  }
+
   .custom-card-container .custom-card {
       max-width: 100%;
       padding: 0.7em;
@@ -564,5 +602,25 @@ a.dd-menu-item:hover {
 
   a.dd-menu-item {
     background-color: #841f314a;
+  }
+
+  #navbarNav {
+    background: #fff;
+  }
+  
+  #navbarNav a.nav-link {
+    color: #000;
+  }
+  #navbarNav a.nav-link:hover {
+    color: #fff;
+  }
+
+  #navbarNav .login-parent,
+  #navbarNav .login-parent:hover {
+    color: #000;
+  }
+
+  .customSubMenuHolder {
+    align-self: center;
   }
 }

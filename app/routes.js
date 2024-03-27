@@ -8,9 +8,9 @@ module.exports = function (app) {
   app.get('/', postController.homePage);
   app.get('/test', postController.testPage);
   app.get('/login', login.renderLogin);
-  app.get('/posts', postController.getAllPosts);
-  app.get('/add_post', pageController.getAddPage);
-  app.get('/post/:id', postController.getPostByID);
+  app.get('/posts', auth.requireLoginPage, postController.getAllPosts);
+  app.get('/add_post', auth.requireLoginPage, pageController.getAddPage);
+  app.get('/post/:id', auth.requireLoginPage, postController.getPostByID);
   app.get('/logout', login.logout);
 
 
@@ -23,6 +23,6 @@ module.exports = function (app) {
   // posts
   app.get('/api/posts/cards', auth.isApi, postController.getCardsTemplate);
   app.get('/api/post/:id', postController.getPost);
-  app.post('/api/add-post', auth.requireLogin, postController.createPost);
-  app.put('/api/add-post', auth.requireLogin, postController.updatePost);
+  app.post('/api/add-post', auth.requireLoginApi, postController.createPost);
+  app.put('/api/add-post', auth.requireLoginApi, postController.updatePost);
 };

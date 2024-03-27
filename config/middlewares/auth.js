@@ -1,10 +1,24 @@
-const { sendResponse } = require('../../helper/util');
+const { sendResponse, errorTemplate } = require('../../helper/util');
 const { verify } = require('./jwt');
 
 var exportAuth = {
-    requireLogin: function(req, res, next) {
+    requireLoginApi: function(req, res, next) {
         if(!req.user) {
             return sendResponse(res, 401, req.tokenMessage || 'User is not Authenticated');
+        }
+        next();
+    },
+    requireLoginPage: function(req, res, next) {
+        console.log(req.url);
+        if(!req.user) {
+            let options = {
+                title: "UNAUTHORIZED",
+                sub_title: "Please login to access page content",
+                message: "The Page you are looking for requires login to get accessed",
+                redirect: "/login",
+                button: "LOGIN"
+            };
+            return errorTemplate(res, options);
         }
         next();
     },

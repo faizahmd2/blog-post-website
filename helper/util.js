@@ -25,6 +25,12 @@ exports.errorTemplate = function(res, options={}) {
     if(!options.message) {
         options.message = "The page you are looking for does not exist.How you got here is a mystery. But you can click the button belowto go back to the homepage.";
     }
+    if(!options.redirect) {
+        options.redirect = "/";
+    }
+    if(!options.button) {
+        options.button = "HOME";
+    }
     
     res.render(path, options);
 }

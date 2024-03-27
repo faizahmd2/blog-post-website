@@ -53,7 +53,8 @@
         }
 
         h1 {
-            font-size: 7.5em;
+            word-break: break-all;
+            font-size: <%= (title + "").length > 3 ? "3.5em" : "7.5em" %>;
             margin: 15px 0px;
             font-weight: bold;
         }
@@ -114,6 +115,10 @@
             .container {
                 margin-top: 70px;
                 margin-bottom: 70px;
+            }
+
+            h1 {
+                font-size: <%= (title + "").length > 3 ? "2.1em" : "6.5em" %>;
             }
         }
     </style>
@@ -393,8 +398,8 @@
                 <p>
                     <%= message %>
                 </p>
-                <form action="/" method="get">
-                    <button type="submit" class="btn green">HOME</button>
+                <form action="<%= redirect %>" method="get">
+                    <button type="submit" class="btn green"><%= button %></button>
                 </form>
             </div>
         </div>

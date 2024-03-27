@@ -4,7 +4,7 @@
 <link rel="stylesheet" href="css/add_post.css">
 
 <body class="background-image">
-<%- include('partials/_navigation', { user }) -%>
+<%- include('partials/_navbar', { user }) -%>
 
 
   <div class="form-container">
@@ -84,6 +84,8 @@
 
       if(validationError) return notify.error(validationError);
 
+      showLoader();
+
       let response = await fetchData('/api/add-post', 'POST', formData);
 
       if(response.error) return notify.error(response.error);
@@ -92,11 +94,12 @@
 
       resetForm();
 
+      hideLoader();
       notify.success("Post Added Successfully!");
 
       setTimeout(() => {
         window.location.href = "/posts";
-      },1000);
+      },700);
     }
 
     function loadContentFromLocalStorage() {
