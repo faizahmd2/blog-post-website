@@ -9,7 +9,7 @@ module.exports = function (app) {
   app.get('/test', postController.testPage);
   app.get('/login', login.renderLogin);
   app.get('/posts', auth.requireLoginPage, postController.getAllPosts);
-  app.get('/add_post', auth.requireLoginPage, pageController.getAddPage);
+  app.get('/add_post', pageController.getAddPage);
   app.get('/post/:id', auth.requireLoginPage, postController.getPostByID);
   app.get('/logout', login.logout);
 
