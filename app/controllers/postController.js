@@ -136,7 +136,7 @@ exports.updatePost = async function (req, res) {
     let publicPost = visiblity == "publish";
     set = { publicPost: publicPost };
   } else if(type == "remove") {
-    
+
     const filter = {user_id: req.user.user_id, _id: id};
     await Post.findOneAndDelete(filter);
     return res.json({ success: true });
@@ -169,7 +169,7 @@ var helper = {
           ]
         }
 
-        if(req.isHome) {
+        if(req.isHome || req.query.t == "r") {
           q['$or'].push({ publicPost: false, user_id: req.user.user_id });
         } else {
           q = { user_id: req.user.user_id };
