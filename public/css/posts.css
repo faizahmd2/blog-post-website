@@ -174,13 +174,15 @@
     }
 }
 
-#post-modal-parent .icons button.hide,
-#post-modal-parent .icons i.hide {
+#post-modal-parent.hide,
+#post-modal-parent button.hide,
+#post-modal-parent i.hide {
     display: none;
 }
 
-#post-modal-parent .icons button:not(.hide),
-#post-modal-parent .icons i:not(.hide) {
+#post-modal-parent button:not(.hide),
+#post-modal-parent:not(.hide),
+#post-modal-parent i:not(.hide) {
     display: block;
 }
 
@@ -199,6 +201,11 @@
 
     #custom-modal .header .icons {
         gap: 8px;
+    }
+
+    .searchbar {
+        justify-content: center;
+        margin-bottom: 5px;
     }
 
 }

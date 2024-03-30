@@ -9,7 +9,6 @@ var exportAuth = {
         next();
     },
     requireLoginPage: function(req, res, next) {
-        console.log(req.url);
         if(!req.user) {
             let options = {
                 title: "UNAUTHORIZED",

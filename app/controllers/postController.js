@@ -105,12 +105,12 @@ exports.getPost = async (req, res) => {
   if(!req.params.id) return sendResponse(res, 400, "Parameters Missing");
 
   const post = await Post.findById(req.params.id);
-  const _post = fs.readFileSync('views/partials/_postModal.ejs', 'utf8');
+  // const _post = fs.readFileSync('views/partials/_postModal.ejs', 'utf8');
 
-  const postInfo = { post: { content: post.content, title: post.title, description: post.contentText, publish: !post.publicPost, editable: req.user && req.user.user_id == post.user_id.toString() }};
-  const renderedPartial = ejs.render(_post, postInfo);
+  // const postInfo = { post: { content: post.content, title: post.title, description: post.contentText, publish: !post.publicPost, editable: req.user && req.user.user_id == post.user_id.toString() }};
+  // const renderedPartial = ejs.render(_post, postInfo);
 
-  res.json({success: true, modalHtml: renderedPartial, content: post.content});
+  res.json({success: true, content: post.content, title: post.title, description: post.contentText, publish: !post.publicPost, editable: req.user && req.user.user_id == post.user_id.toString()});
 };
 
 exports.createPost = async (req, res) => {
