@@ -2,7 +2,7 @@ const Post = require('../models/Post');
 const fs = require('fs');
 const ejs = require('ejs');
 const zlib = require('zlib');
-const { pageRender, sendResponse, errorTemplate, renderTemplate } = require('../../helper/util');
+const { pageRender, sendResponse, errorTemplate } = require('../../helper/util');
 const { isValidObjectId } = require('mongoose');
 const postsPerPage = 50;
 
@@ -105,7 +105,7 @@ exports.getPost = async (req, res) => {
   if(!req.params.id) return sendResponse(res, 400, "Parameters Missing");
 
   const post = await Post.findById(req.params.id);
-  
+
   res.json({success: true, content: post.content, title: post.title, description: post.contentText, publish: !post.publicPost, editable: req.user && req.user.user_id == post.user_id.toString()});
 };
 
@@ -136,7 +136,10 @@ exports.updatePost = async function (req, res) {
     let publicPost = visiblity == "publish";
     set = { publicPost: publicPost };
   } else if(type == "remove") {
-    set = { status: 0 };
+    
+    const filter = {user_id: req.user.user_id, _id: id};
+    await Post.findOneAndDelete(filter);
+    return res.json({ success: true });
   } else {
     return sendResponse(res, 400, "Invalid Parameter Request");
   }
