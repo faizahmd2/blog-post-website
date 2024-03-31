@@ -375,7 +375,7 @@
       if(isLoading) return;
 
       showLoader();
-      if(modalEditor && postModalId) {
+      if(postModalId) {
         let response = await fetchData('/api/add-post', 'PUT', {id: postModalId, visiblity: mode, type: "visiblity"});
 
         if(response.error) return notify.error(response.error);
