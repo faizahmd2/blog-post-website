@@ -6,5 +6,6 @@ module.exports = {
   BASE_URL: process.env.BASE_URL || "http://localhost:2900",
   JWT_SECRET: process.env.JWT_SECRET || "jwt$ecret",
   JWT_EXPIRY: process.env.JWT_EXPIRY && `${process.env.JWT_EXPIRY}hr` || '1hr',
-  LOGIN_COOKIE_EXPIRY: process.env.JWT_EXPIRY && (process.env.JWT_EXPIRY * 60 * 60 * 1000) || (24 *60 * 60 * 1000)
+  LOGIN_COOKIE_EXPIRY: process.env.JWT_EXPIRY && (process.env.JWT_EXPIRY * 60 * 60 * 1000) || (24 *60 * 60 * 1000),
+  editor: process.env.editor
 };

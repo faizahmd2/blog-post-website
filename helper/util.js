@@ -10,6 +10,10 @@ exports.pageRender = function(req, res, page) {
         options.user = null;
     }
 
+    if(!options.hasOwnProperty("config")) {
+        options.config = {};
+    }
+
     res.render(page, options);
 }
 

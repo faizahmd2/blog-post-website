@@ -17,6 +17,10 @@ const PostSchema = new Schema({
     type: Number,
     default: 1
   },
+  editor: {
+    type: String,
+    default: ""
+  },
   created: Date,
   modified: {
     type: Date,
