@@ -1,5 +1,6 @@
 const { sendResponse, errorTemplate } = require('../../helper/util');
 const { verify } = require('./jwt');
+const config = require('../config');
 
 var exportAuth = {
     requireLoginApi: function(req, res, next) {
@@ -24,7 +25,10 @@ var exportAuth = {
     userTokenInfo: function(req, res, next) {
         let url = req.url;
         if(url.includes(".")) return next();
+
+        console.log("req : ", url);
         req.options = {};
+        req.options.config = config;
         
         const token = req.cookies && req.cookies.token;
         if (!token) {

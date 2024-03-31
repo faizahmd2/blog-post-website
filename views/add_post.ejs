@@ -1,11 +1,17 @@
 <%- include('partials/_header') -%>
-<!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/quill/1.3.7/quill.snow.min.css" integrity="sha512-/FHUK/LsH78K9XTqsR9hbzr21J8B8RwHR/r8Jv9fzry6NVAOVIGFKQCNINsbhK7a1xubVu2r5QZcz2T9cKpubw==" crossorigin="anonymous" referrerpolicy="no-referrer" /> -->
-<link rel="stylesheet" href="vendor/quillJs/css/quill.snow.min.css">
+
+<% if (config.editor == "quill") { %>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/quill/1.3.7/quill.snow.min.css" integrity="sha512-/FHUK/LsH78K9XTqsR9hbzr21J8B8RwHR/r8Jv9fzry6NVAOVIGFKQCNINsbhK7a1xubVu2r5QZcz2T9cKpubw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <!-- <link rel="stylesheet" href="vendor/quillJs/css/quill.snow.min.css"> -->
+<% } else { %>
+  <!-- ckeditor -->
+  <link rel="stylesheet" href="css/font-family.css">
+<% } %>
+
 <link rel="stylesheet" href="css/add_post.css">
 
 <body class="background-image">
 <%- include('partials/_navbar', { user }) -%>
-
 
   <div class="form-container">
     <div class="form-group floating-label-form-group">
@@ -25,42 +31,61 @@
       </div>
     </div>
   </div>
-  <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/quill/2.0.0-beta.0/quill.min.js" integrity="sha512-P2W2rr8ikUPfa31PLBo5bcBQrsa+TNj8jiKadtaIrHQGMo6hQM6RdPjQYxlNguwHz8AwSQ28VkBK6kHBLgd/8g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script> -->
-  <script src="vendor/quillJs/js/quill.min.js"></script>
-
   <!-- utility JS -->
   <script src="js/utility.js"></script>
-  <script>
-    var editor;
-    $(document).ready(function() {
-      const toolbarOptions = getToolbarOptions();
 
-      editor = new Quill('#editor', {
-        modules: {
-          toolbar: toolbarOptions
-        },
-        theme: 'snow'
-      });
-      
-      editor.on('text-change', function() {
-        const currentContent = JSON.stringify(editor.getContents());
-        localStorage.setItem('post_cached_content', currentContent);
-      });
+  <% if (config.editor == "quill") { %>
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/quill/2.0.0-beta.0/quill.min.js" integrity="sha512-P2W2rr8ikUPfa31PLBo5bcBQrsa+TNj8jiKadtaIrHQGMo6hQM6RdPjQYxlNguwHz8AwSQ28VkBK6kHBLgd/8g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script> -->
+    <script src="vendor/quillJs/js/quill.min.js"></script>
+  <% } else { %>
+    <!-- ckeditor -->
+    <script src="https://cdn.ckeditor.com/ckeditor5/41.2.1/super-build/ckeditor.js"></script>
+    <!-- <script src="vendor/ck-editor/js/ckeditor.js"></script> -->
+    <script src="vendor/ck-editor/js/config/classic.js"></script>
+  <% } %>
+
+
+  <script>
+    let editorName = '<%= config.editor || "ck"  %>';
+    var ckEditor, qEditor, content = localStorage.getItem("post_cached_content");
+
+    $(document).ready(function() {
+      if(editorName == "quill") {
+        const toolbarOptions = getToolbarOptions();
+        qEditor = new Quill('#editor', {
+          modules: {
+            toolbar: toolbarOptions
+          },
+          theme: 'snow'
+        });
+
+        qEditor.on('text-change', function() {
+          const currentContent = JSON.stringify(qEditor.getContents());
+          localStorage.setItem('post_cached_content', currentContent);
+        });
+        setCacheDataOnLoad();
+      } else {
+        showLoader();
+        CKEDITOR.ClassicEditor.create(document.getElementById("editor"), ckEditorConfig).then((newEditor) => {
+          ckEditor = newEditor;
+          setCacheDataOnLoad();
+          hideLoader();
+          ckEditor.model.document.on('change:data', () => {
+            const data = ckEditor.getData();
+            localStorage.setItem("post_cached_content",data);
+          });
+        });
+      }
 
       $("input[name='title']").on("input", function(e) {
-        console.log("title input change",$("input[name='title']").val());
         localStorage.setItem('post_cached_title', $("input[name='title']").val());
       });
 
       $("input[name='publicPost']").change(function(e) {
-        console.log("public input change",$("input[name='publicPost']").prop("checked"),typeof $("input[name='publicPost']").prop("checked"));
         localStorage.setItem('post_cached_publicPost', $("input[name='publicPost']").prop("checked"));
       });
-      
-      setCacheDataOnLoad();
 
       $("button[type='submit']").prop("disabled", false);
-
     });
 
     function setCacheDataOnLoad() {
@@ -104,18 +129,27 @@
 
     function loadContentFromLocalStorage() {
       const savedContent = localStorage.getItem('post_cached_content');
-      if (savedContent) {
+      if(!savedContent) return;
+
+      if(editorName == "quill" && qEditor) {
         try {
           const parsedContent = JSON.parse(savedContent);
-          editor.setContents(parsedContent); 
+          qEditor.setContents(parsedContent); 
         } catch (error) {
           console.error('Error parsing stored content:', error);
         }
+      } else if(ckEditor) {
+        ckEditor.setData(savedContent);
       }
     }
 
     function resetForm () {
-      editor.setText('');
+      if(editorName == "quill" && qEditor) {
+        qEditor.setText('');
+      } else if(ckEditor) {
+        ckEditor.setData('');
+      }
+      
       $("input[name='title']").val('');
       $("input[name='publicPost']").prop("checked", false);
       localStorage.removeItem('post_cached_content');
@@ -132,21 +166,29 @@
     }
 
     function getFormData() {
-      const contentText = editor.getText(0, editor.getLength());
-      console.log("--------");
-      console.log(contentText);
-      const currentContent = JSON.stringify(editor.getContents());
-      console.log(currentContent);
-
-      const title = $("input[name='title']").val();
-      const publicPost = $("input[name='publicPost']").prop("checked");
-
-      return {title, content: currentContent, contentText, publicPost};
+      if(editorName == "quill" && qEditor) {
+        const contentText = qEditor.getText(0, qEditor.getLength());
+        console.log("--------");
+        console.log(contentText);
+        const currentContent = JSON.stringify(qEditor.getContents());
+        console.log(currentContent);
+  
+        const title = $("input[name='title']").val();
+        const publicPost = $("input[name='publicPost']").prop("checked");
+  
+        return {title, content: currentContent, contentText: contentText, publicPost, editor: "quill"};
+      } else if(ckEditor) {
+        const currentContent = ckEditor.getData();
+  
+        const title = $("input[name='title']").val();
+        const publicPost = $("input[name='publicPost']").prop("checked");
+  
+        return {title, content: currentContent, contentText: "NA", publicPost};
+      }
     }
 
     function getToolbarOptions() {
       const device = deviceInfo();
-      console.log("device===",device);
       // notify.success(JSON.stringify(device));
       if(device.mobile) {
         // Mobile configuration

@@ -110,7 +110,7 @@ exports.getPost = async (req, res) => {
 };
 
 exports.createPost = async (req, res) => {
-  let { title, content, contentText, publicPost } = req.body;
+  let { title, content, contentText, publicPost, editor='' } = req.body;
   if (!title || !contentText || contentText.length <= 1 || typeof publicPost != "boolean") return sendResponse(res, 400, "Invalid Parameter Request");
 
   await Post.create({
@@ -119,6 +119,7 @@ exports.createPost = async (req, res) => {
     contentText: contentText,
     publicPost: publicPost,
     user_id: req.user.user_id,
+    editor: editor,
     status: 1,
     created: Date.now()
   })
