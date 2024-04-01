@@ -88,19 +88,7 @@
       });
 
       $("button[type='submit']").prop("disabled", false);
-
-      window.addEventListener('beforeunload', handleBeforeUnload);
     });
-
-    function handleBeforeUnload(event) {
-      console.log("UNLOAD", JSON.stringify(event));
-      // resetForm();
-
-      // Optionally, you can return a string to display a confirmation dialog to the user
-      // This will prompt the user with a dialog asking if they want to leave the page
-      // Make sure to return undefined to prevent the dialog from showing if no cleanup is needed
-      //return 'Are you sure you want to leave this page?';
-    }
 
     function setCacheDataOnLoad() {
       loadContentFromLocalStorage();
@@ -180,27 +168,20 @@
     }
 
     function getFormData() {
+      const title = $("input[name='title']").val();
+      const publicPost = $("input[name='publicPost']").prop("checked");
+
       if(editorName == "quill" && qEditor) {
         const contentText = qEditor.getText(0, qEditor.getLength());
-        console.log("--------");
-        console.log(contentText);
         const currentContent = JSON.stringify(qEditor.getContents());
-        console.log(currentContent);
-  
-        const title = $("input[name='title']").val();
-        const publicPost = $("input[name='publicPost']").prop("checked");
   
         return {title, content: currentContent, contentText: contentText, publicPost, editor: "quill"};
       } else if(ckEditor) {
         const currentContent = ckEditor.getData();
-
         const contentText = stripHtmlTags(currentContent);
 
         const lines = contentText.split('\n').slice(0, 6);
         const firstFewLines = lines.join('\n');
-  
-        const title = $("input[name='title']").val();
-        const publicPost = $("input[name='publicPost']").prop("checked");
   
         return {title, content: currentContent, contentText: firstFewLines, publicPost};
       }

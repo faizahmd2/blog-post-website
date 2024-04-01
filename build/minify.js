@@ -14,7 +14,7 @@ async function minifyAndCopy(directory) {
       const stats = await fs.promises.stat(filePath);
 
       if (stats.isDirectory()) {
-        await minifyAndCopy(filePath); // Recursively process subdirectories
+        await minifyAndCopy(filePath);
       } else {
         const fileExtension = path.extname(filePath).toLowerCase();
 

@@ -6,7 +6,6 @@ const pageController = require('./controllers/pageController');
 module.exports = function (app) {
   /* PAGES */
   app.get('/', postController.homePage);
-  app.get('/test', postController.testPage);
   app.get('/login', login.renderLogin);
   app.get('/posts', auth.requireLoginPage, postController.getAllPosts);
   app.get('/add_post', pageController.getAddPage);

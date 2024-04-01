@@ -1,5 +1,9 @@
 <%- include('partials/_header') -%>
-<link rel="stylesheet" href="css/login.css">
+<% if (config.isProduction) { %>
+  <link rel="stylesheet" href="build/login.css">
+<% } else { %>
+  <link rel="stylesheet" href="css/login.css">
+<% } %>
 
 <body class="background-image" style="overflow: hidden;">
   <%- include('partials/_navbar', { user }) -%>
