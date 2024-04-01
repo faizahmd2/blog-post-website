@@ -2,13 +2,18 @@
 
 <% if (config.editor == "quill") { %>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/quill/1.3.7/quill.snow.min.css" integrity="sha512-/FHUK/LsH78K9XTqsR9hbzr21J8B8RwHR/r8Jv9fzry6NVAOVIGFKQCNINsbhK7a1xubVu2r5QZcz2T9cKpubw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-  <!-- <link rel="stylesheet" href="vendor/quillJs/css/quill.snow.min.css"> -->
+  <script src="vendor/quillJs/js/quill.min.js"></script>
 <% } else { %>
-  <!-- ckeditor -->
   <link rel="stylesheet" href="css/font-family.css">
+  <script src="https://cdn.ckeditor.com/ckeditor5/41.2.1/super-build/ckeditor.js"></script>
 <% } %>
 
-<link rel="stylesheet" href="css/add_post.css">
+<% if (config.isProduction) { %>
+  <link rel="stylesheet" href="build/add_post.css">
+<% } else { %> 
+  <link rel="stylesheet" href="css/add_post.css">
+<% } %>
+
 
 <body class="background-image">
 <%- include('partials/_navbar', { user }) -%>
@@ -31,22 +36,19 @@
       </div>
     </div>
   </div>
-  <!-- utility JS -->
-  <script src="js/utility.js"></script>
-
-  <% if (config.editor == "quill") { %>
-    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/quill/2.0.0-beta.0/quill.min.js" integrity="sha512-P2W2rr8ikUPfa31PLBo5bcBQrsa+TNj8jiKadtaIrHQGMo6hQM6RdPjQYxlNguwHz8AwSQ28VkBK6kHBLgd/8g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script> -->
-    <script src="vendor/quillJs/js/quill.min.js"></script>
-  <% } else { %>
-    <!-- ckeditor -->
-    <script src="https://cdn.ckeditor.com/ckeditor5/41.2.1/super-build/ckeditor.js"></script>
-    <!-- <script src="vendor/ck-editor/js/ckeditor.js"></script> -->
-    <script src="vendor/ck-editor/js/config/classic.js"></script>
-  <% } %>
-
 
   <script>
     let editorName = '<%= config.editor || "ck"  %>';
+  </script>
+
+  <% if (config.isProduction) { %>
+    <script src="build/utility.js"></script>
+    <script src="vendor/ck-editor/js/config/classic.js"></script>
+    <script src="build/add_post.js"></script>
+  <% } else { %>
+  <script src="js/utility.js"></script>
+  <script src="vendor/ck-editor/js/config/classic.js"></script>
+  <script build="add_post">
     var ckEditor, qEditor, content = localStorage.getItem("post_cached_content");
 
     $(document).ready(function() {
@@ -222,4 +224,5 @@
     }
 
   </script>
+  <% } %>
 </body>

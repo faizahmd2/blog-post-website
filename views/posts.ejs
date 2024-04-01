@@ -1,16 +1,18 @@
 <%- include('partials/_header') -%>
-
-<!-- Simple Pagination css -->
-<!-- <link rel="stylesheet" href="vendor/jquery/css/simplePagination.min.css"> -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/simplePagination.js/1.6/simplePagination.min.css" integrity="sha512-m3x+GduGUoEMGB6dywpah/mAG3GafMmxmByGLqKfZFF8xr6THjjOcH0OWV1rLBFiZMotecZxWhRz0lVlVNl72w==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
 <% if (config.editor == "quill") { %>
-  <!-- quill -->
-  <!-- <link rel="stylesheet" href="vendor/quillJs/css/quill.bubble.min.css"> -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/quill/1.3.7/quill.bubble.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/quill/1.3.7/quill.bubble.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <script src="vendor/quillJs/js/quill.min.js"></script>
+<% } else { %>
+  <script src="https://cdn.ckeditor.com/ckeditor5/41.2.1/super-build/ckeditor.js"></script>
 <% } %>
 
-<link rel="stylesheet" href="css/posts.css">
+<% if (config.isProduction) { %>
+  <link rel="stylesheet" href="build/posts.css">
+<% } else { %> 
+  <link rel="stylesheet" href="css/posts.css">
+<% } %>
 
 <body class="background-image" style="overflow: hidden;">
   <%- include('partials/_navbar', { user }) -%>
@@ -65,23 +67,20 @@
       <%- include('partials/_not_found', { data: {title: "No Posts Found", sub_title: "Get Login to add your own posts.", link: "/login", link_text: "Go To Login"} }) -%>
     <% } %>
 
-  <!-- Simple Pagination js -->
-  <script src="js/utility.js"></script>
-
   <!-- <script src="/public/vendor/jquery/js/jquery.min.js"></script> -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/simplePagination.js/1.6/jquery.simplePagination.min.js" integrity="sha512-9Dh726RTZVE1k5R1RNEzk1ex4AoRjxNMFKtZdcWaG2KUgjEmFYN3n17YLUrbHm47CRQB1mvVBHDFXrcnx/deDA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-
-  <% if (config.editor == "quill") { %>
-    <!-- quill -->
-    <script src="vendor/quillJs/js/quill.min.js"></script>
-  <% } else { %>
-    <!-- ckeditor -->
-    <script src="https://cdn.ckeditor.com/ckeditor5/41.2.1/super-build/ckeditor.js"></script>
-    <script src="vendor/ck-editor/js/config/bubble.js"></script>
-  <% } %>
-
   <script>
     let editorName = '<%= config.editor || "ck"  %>';
+  </script>
+
+  <% if (config.isProduction) { %>
+    <script src="build/utility.js"></script>
+    <script src="vendor/ck-editor/js/config/bubble.js"></script>
+    <script src="build/posts.js"></script>
+  <% } else { %>
+  <script src="js/utility.js"></script>
+  <script src="vendor/ck-editor/js/config/bubble.js"></script>
+  <script build="posts">
     const debouncedListChange = debounce(handleListChange, 600);
     var modalEditor, ckEditor, initialContent = null, postModal=null, postModalId = null;
 
@@ -412,7 +411,6 @@
       $("#post-modal-parent .icons i[edit-modal]").removeClass('hide');
     }
 
-    '<% if (config.editor == "quill") { %>'
     function getToolbarOptions() {
       const device = deviceInfo();
       // notify.success(JSON.stringify(device));
@@ -442,8 +440,8 @@
         ];
       }
     }
-    '<% } %>'
   </script>
+  <% } %>
 </body>
 
 

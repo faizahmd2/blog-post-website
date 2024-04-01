@@ -85,10 +85,12 @@
         </form>
       </div>
     </div>
-  
-  <!-- Main JS -->
+  <% if (config.isProduction) { %>
+    <script src="build/utility.js"></script>
+    <script src="build/login.js"></script>
+  <% } else { %>
   <script src="js/utility.js"></script>
-  <script>
+  <script build="login">
     let validationInput = [];
 
     document.addEventListener("DOMContentLoaded", function() {
@@ -353,4 +355,5 @@
       return error;
     }
   </script>
+  <% } %>
 </body>
