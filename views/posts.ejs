@@ -143,7 +143,13 @@
     async function getPostsByApi() {
       let locationSearch = window.location.search;
       let t = window.location.pathname == "/" ? "r" : "p";
-      let template_url = "/api/posts/cards" + locationSearch + "?t=" + t;
+      let template_url = "/api/posts/cards" + locationSearch;
+      if(locationSearch.includes("?")) {
+        template_url +=  "&t=" + t;
+      } else {
+        template_url +=  "?t=" + t;
+      }
+
       let response_template = await fetchData(template_url);
 
       if(response_template.status != 226) return notify.error("Some error occured");
