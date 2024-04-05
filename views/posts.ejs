@@ -354,10 +354,35 @@
       $("#post-modal-parent .icons button[edit-modal-clear]").removeClass('hide');
     }
 
-    async function onSavePostModal() {
+    async function editModalSave() {
       if(isLoading) return;
-      
       showLoader();
+
+      if(editorName == "quill") {
+        onSaveQuillPostModal();
+      } else if(ckEditor && postModalId) {
+        const currentContent = ckEditor.getData();
+        const contentText = stripHtmlTags(currentContent);
+
+        const lines = contentText.split('\n').slice(0, 6);
+        const firstFewLines = lines.join('\n');
+
+        if(!contentText || contentText == "" || contentText.length <= 1) return notify.error("Post Content can't be empty");
+
+        let response = await fetchData('/api/add-post', 'PUT', {id: postModalId, contentText:firstFewLines, content: currentContent, type: "edit"});
+
+        if(response.error) return notify.error(response.error);
+
+        if(!response.success) return notify.error("Some error occured");
+
+        initialContent = currentContent;
+        onClearPostModal();
+      }
+
+      hideLoader();
+    }
+
+    async function onSaveQuillPostModal() {
       if(modalEditor && postModalId) {
         const contentText = modalEditor.getText(0, modalEditor.getLength());
         const currentContent = JSON.stringify(modalEditor.getContents());
@@ -370,10 +395,9 @@
 
         if(!response.success) return notify.error("Some error occured");
 
-        initialContent = null;
+        initialContent = currentContent;
         onClearPostModal();
       }
-      hideLoader();
     }
 
     async function onPostVisiblityChange(mode) {
